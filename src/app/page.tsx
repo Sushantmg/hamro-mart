@@ -1,6 +1,6 @@
 "use client";
 
-import Categories from "@/_components/home/categories";
+import Categories from "@/_components/home/Categories";
 import Img from "@/_components/Img";
 import Home from "@/_pages/Home";
 import Products from "@/_pages/Products";
