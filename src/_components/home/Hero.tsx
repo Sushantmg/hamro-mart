@@ -14,7 +14,6 @@ const Hero: React.FC = () => {
           animate-fadeIn
         "
       >
-        {/* Text Content */}
         <div className="text-gray-800 dark:text-green-300 md:w-1/2 space-y-4">
           <h1 className="text-4xl font-extrabold tracking-tight drop-shadow-md">
             Fresh & Healthy <br /> Veggies & Fruits
@@ -35,7 +34,6 @@ const Hero: React.FC = () => {
           </button>
         </div>
 
-        {/* Image Placeholder */}
         <div className="mt-8 md:mt-0 md:ml-8 md:w-1/2 flex justify-center">
           <img
             src="/hero-icon.png"
@@ -44,23 +42,6 @@ const Hero: React.FC = () => {
           />
         </div>
       </div>
-
-      {/* Animation keyframes */}
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(15px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.8s ease forwards;
-        }
-      `}</style>
     </section>
   );
 };

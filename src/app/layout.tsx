@@ -7,11 +7,13 @@ import { ThemeProvider } from "@/context/ThemeContext";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap", // Optional: improves perceived performance
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -30,9 +32,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeProvider>
-        <CartProvider>
-        {children}
-        </CartProvider>
+          <CartProvider>{children}</CartProvider>
         </ThemeProvider>
       </body>
     </html>
