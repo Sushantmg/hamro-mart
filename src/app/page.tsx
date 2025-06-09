@@ -9,7 +9,6 @@ import Products from "@/_pages/Products";
 export default function HomePage() {
   return (
     <>
-     
       <Home/>
       <Categories/>
       <Products/>
