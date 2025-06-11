@@ -1,8 +1,15 @@
+import AdminLayout from '@/_components/admin/AdminLayout'
+import ManageProducts from '@/_components/admin/ManageProducts'
+import ManageUsers from '@/_components/admin/ManageUsers'
 import React from 'react'
 
 function layout() {
   return (
-    <div>layout</div>
+    <div>
+      <AdminLayout/>
+      <ManageProducts/>
+      <ManageUsers/>
+    </div>
   )
 }
 
