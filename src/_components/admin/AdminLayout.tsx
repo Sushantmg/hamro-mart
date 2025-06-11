@@ -40,7 +40,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-gray-100">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-gray-100 fixed">
       {/* Sidebar for desktop */}
       <aside className="hidden lg:flex w-64 bg-gray-900 text-white flex-col py-6 px-4 shadow-lg">
         <Link
@@ -61,7 +61,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 p-8 overflow-y-auto pb-20 lg:pb-8">{children}</main>
+      <main className="flex-1 p-8 overflow-y-auto pb-20 lg:pb-8 pl-10">{children}</main>
 
       {/* Bottom nav for mobile */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-300 flex justify-around items-center h-16 lg:hidden shadow-inner">
