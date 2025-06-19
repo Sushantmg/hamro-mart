@@ -11,7 +11,7 @@ import React, {
 // Type for each product in the cart
 export type Product = {
   id: number | string;
-  name: string;
+  title:string;
   price: number;
   discountedPrice?: number;
   quantity?: number;

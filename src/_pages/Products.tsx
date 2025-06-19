@@ -11,7 +11,7 @@ interface Product {
   description: string;
   price: number;
   discount: number;
-  discountedPrice: number | null;
+  discountedPrice: number;
 }
 
 
@@ -25,7 +25,7 @@ export default function ProductsPage() {
   const { addToCart } = useCart();
 
   useEffect(() => {
-    fetch("http://localhost:7000/products")
+    fetch("http://localhost:3007/products")
       .then((res) => res.json())
       .then((data) => {
         const updatedData: Product[] = data.map((item: any) => {
