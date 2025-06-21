@@ -1,7 +1,20 @@
-import React, { useEffect, useState } from "react";
-import { useCart } from "../context/CartContext";
-import toast from "react-hot-toast";
-import Link from "next/link";
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
+import { useCart } from '../context/CartContext';
+import toast from 'react-hot-toast';
+import Link from 'next/link';
+
+interface ApiProduct {
+  id: number;
+  name: string;
+  category: string;
+  image: string;
+  desc: string;
+  price: number | string;
+  discount: number;
+}
 
 interface Product {
   id: number;
@@ -17,21 +30,20 @@ interface Product {
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-  const [sortOrder, setSortOrder] = useState<string>("");
-  const [categoryFilter, setCategoryFilter] = useState<string>("all");
-  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [sortOrder, setSortOrder] = useState<string>('');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   const { addToCart } = useCart();
 
   useEffect(() => {
-    fetch("http://localhost:3007/products")
+    fetch('http://localhost:3007/products')
       .then((res) => res.json())
-      .then((data) => {
-        const updatedData: Product[] = data.map((item: any) => {
+      .then((data: ApiProduct[]) => {
+        const updatedData: Product[] = data.map((item) => {
+          const priceNum = Number(item.price);
           const discountedPrice = item.discount
-            ? parseFloat(
-                (item.price - (item.price * item.discount) / 100).toFixed(2)
-              )
+            ? parseFloat(((priceNum * (100 - item.discount)) / 100).toFixed(2))
             : null;
 
           return {
@@ -40,7 +52,7 @@ export default function ProductsPage() {
             category: item.category,
             image: item.image,
             description: item.desc,
-            price: parseFloat(item.price),
+            price: priceNum,
             discount: item.discount,
             discountedPrice,
           };
@@ -49,26 +61,28 @@ export default function ProductsPage() {
         setProducts(updatedData);
         setFilteredProducts(updatedData);
       })
-      .catch((err) => console.error("Failed to fetch products:", err));
+      .catch((err) => console.error('Failed to fetch products:', err));
   }, []);
 
   const filterSortSearchProducts = () => {
     let tempProducts = [...products];
 
-    if (categoryFilter !== "all") {
+    if (categoryFilter !== 'all') {
       tempProducts = tempProducts.filter((p) => p.category === categoryFilter);
     }
-    if (searchTerm.trim() !== "") {
+
+    if (searchTerm.trim() !== '') {
       tempProducts = tempProducts.filter((p) =>
         p.title.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-    if (sortOrder === "asc") {
+
+    if (sortOrder === 'asc') {
       tempProducts.sort(
         (a, b) =>
           (a.discountedPrice ?? a.price) - (b.discountedPrice ?? b.price)
       );
-    } else if (sortOrder === "desc") {
+    } else if (sortOrder === 'desc') {
       tempProducts.sort(
         (a, b) =>
           (b.discountedPrice ?? b.price) - (a.discountedPrice ?? a.price)
@@ -78,7 +92,7 @@ export default function ProductsPage() {
     setFilteredProducts(tempProducts);
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     filterSortSearchProducts();
   }, [sortOrder, categoryFilter, searchTerm, products]);
 
@@ -131,12 +145,17 @@ export default function ProductsPage() {
             className="bg-white dark:bg-gray-800 rounded-xl shadow p-4 flex flex-col items-center hover:scale-105 transition-all transform duration-150"
           >
             <Link href={`/products/${product.id}`} className="w-full block">
-              <img
-                src={product.image}
-                alt={product.title}
-                loading="lazy"
-                className="w-full h-40 object-cover rounded mb-3"
-              />
+              <div className="relative w-full h-40 mb-3 rounded overflow-hidden">
+                <Image
+                  src={product.image}
+                  alt={product.title}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 25vw"
+                  style={{ objectFit: 'cover' }}
+                  priority={false}
+                />
+              </div>
+
               <h3 className="text-lg font-bold text-green-700 dark:text-green-300 mb-1 text-center">
                 {product.title}
               </h3>
