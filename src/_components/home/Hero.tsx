@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 
 const Hero: React.FC = () => {
   return (
@@ -35,10 +36,13 @@ const Hero: React.FC = () => {
         </div>
 
         <div className="mt-8 md:mt-0 md:ml-8 md:w-1/2 flex justify-center">
-          <img
+          <Image
             src="/hero-icon.png"
             alt="Fresh fruits and vegetables"
-            className="rounded-lg object-cover w-full max-w-md"
+            className="rounded-lg object-cover"
+            width={400}    // adjust size as needed
+            height={300}   // adjust size as needed
+            priority       // optional: for important images to preload
           />
         </div>
       </div>
