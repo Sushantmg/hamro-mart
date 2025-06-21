@@ -1,29 +1,30 @@
 // app/admin/layout.tsx
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import Cookies from "js-cookie";
 import {
   HomeIcon,
   CubeIcon,
   UserGroupIcon,
   ArrowLeftIcon,
-} from '@heroicons/react/24/outline';
+} from "@heroicons/react/24/outline";
 
 const navItems = [
-  { href: '/admin/dashboard', label: 'Dashboard', Icon: HomeIcon },
-  { href: '/admin/products', label: 'Products', Icon: CubeIcon },
-  { href: '/admin/users', label: 'Users', Icon: UserGroupIcon },
+  { href: "/admin/dashboard", label: "Dashboard", Icon: HomeIcon },
+  { href: "/admin/products", label: "Products", Icon: CubeIcon },
+  { href: "/admin/users", label: "Users", Icon: UserGroupIcon },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname(); // ✅ Moved to top to avoid conditional hook error
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
-  const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem('ecom-token');
-    if (token === 'admin') {
+    const token = Cookies.get("ecom-token");
+    if (token === "admin") {
       setIsAdmin(true);
     } else {
       setIsAdmin(false);
@@ -33,11 +34,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (isAdmin === null) return null;
 
   if (!isAdmin) {
-    return <div className="text-center p-10 text-red-500 text-lg">You are not admin</div>;
-    // Or redirect: router.push('/');
+    return (
+      <div className="text-center p-10 text-red-500 text-lg">
+        You are not authorized to access the admin panel.
+      </div>
+    );
   }
-
-  const pathname = usePathname();
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-gray-100 fixed">
@@ -55,13 +57,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         <nav className="flex flex-col space-y-3">
           {navItems.map(({ href, label, Icon }) => (
-            <NavItem key={href} href={href} label={label} Icon={Icon} pathname={pathname} />
+            <NavItem
+              key={href}
+              href={href}
+              label={label}
+              Icon={Icon}
+              pathname={pathname}
+            />
           ))}
         </nav>
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 p-8 overflow-y-auto pb-20 lg:pb-8 pl-10">{children}</main>
+      <main className="flex-1 p-8 overflow-y-auto pb-20 lg:pb-8 pl-10">
+        {children}
+      </main>
 
       {/* Bottom nav for mobile */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-300 flex justify-around items-center h-16 lg:hidden shadow-inner">
@@ -104,8 +114,8 @@ function NavItem({
       href={href}
       className={`flex items-center space-x-3 px-3 py-2 rounded-md transition-all duration-200 ${
         isActive
-          ? 'bg-gray-800 text-white font-semibold'
-          : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+          ? "bg-gray-800 text-white font-semibold"
+          : "text-gray-300 hover:bg-gray-800 hover:text-white"
       }`}
     >
       <Icon className="h-5 w-5" />
@@ -130,7 +140,7 @@ function BottomNavItem({
     <Link
       href={href}
       className={`flex flex-col items-center justify-center text-xs text-gray-500 px-4 ${
-        isActive ? 'text-blue-600 font-semibold' : 'hover:text-blue-500'
+        isActive ? "text-blue-600 font-semibold" : "hover:text-blue-500"
       }`}
     >
       <Icon className="h-6 w-6 mb-1" />
