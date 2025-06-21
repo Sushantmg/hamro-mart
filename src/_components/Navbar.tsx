@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Cookies from "js-cookie";
 import {
   ShoppingCartIcon,
   PhoneIcon,
@@ -24,12 +25,14 @@ const Navbar = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("ecom-token");
+    
+    const token = Cookies.get("ecom-token");
     setIsLoggedIn(!!token);
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("ecom-token");
+ 
+    Cookies.remove("ecom-token");
     setIsLoggedIn(false);
     setMobileMenuOpen(false);
     router.push("/login");
