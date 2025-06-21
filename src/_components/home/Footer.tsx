@@ -187,7 +187,7 @@ export default function Footer() {
         <p>Made with ❤️ by hamrotheme. Copyright © 2025 Hamro Theme.</p>
         <div className="flex space-x-4 mt-4 md:mt-0">
           <Image
-            src=""
+            src="/copyrightsymbol.jpg"
             alt="Visa Electron"
             width={100}
             height={24}
