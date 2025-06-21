@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
 import { useCart } from '../context/CartContext';
 import toast from 'react-hot-toast';
@@ -64,7 +64,7 @@ export default function ProductsPage() {
       .catch((err) => console.error('Failed to fetch products:', err));
   }, []);
 
-  const filterSortSearchProducts = () => {
+  const filterSortSearchProducts = useCallback(() => {
     let tempProducts = [...products];
 
     if (categoryFilter !== 'all') {
@@ -90,11 +90,11 @@ export default function ProductsPage() {
     }
 
     setFilteredProducts(tempProducts);
-  };
+  }, [products, categoryFilter, searchTerm, sortOrder]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     filterSortSearchProducts();
-  }, [sortOrder, categoryFilter, searchTerm, products]);
+  }, [filterSortSearchProducts]);
 
   return (
     <div className="bg-green-50 dark:bg-gray-900 p-6 transition-colors duration-300">
