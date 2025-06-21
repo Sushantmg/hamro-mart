@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 
 const AD: React.FC = () => {
   return (
@@ -10,7 +11,14 @@ const AD: React.FC = () => {
         <div className="flex flex-col gap-6 flex-1">
           {/* Card 1 */}
           <div className="relative rounded-lg overflow-hidden shadow-md transform transition duration-300 hover:scale-105 hover:shadow-xl bg-white dark:bg-gray-900">
-            <img src="/jam.png" alt="Jam" className="w-full h-48 object-cover" />
+            <Image
+              src="/jam.png"
+              alt="Jam"
+              width={400}     // Set width according to your design
+              height={192}    // Maintain aspect ratio (example: 400x192 for 48 height with w-full)
+              className="w-full object-cover"
+              priority
+            />
             <div className="absolute inset-0 bg-black/30 dark:bg-black/50 p-4 flex flex-col justify-between text-white">
               <div>
                 <h2 className="text-lg font-semibold">Strawberry Jam</h2>
@@ -24,7 +32,14 @@ const AD: React.FC = () => {
 
           {/* Card 2 */}
           <div className="relative rounded-lg overflow-hidden shadow-md transform transition duration-300 hover:scale-105 hover:shadow-xl bg-white dark:bg-gray-900">
-            <img src="/chips.png" alt="Chips" className="w-full h-48 object-cover" />
+            <Image
+              src="/chips.png"
+              alt="Chips"
+              width={400}
+              height={192}
+              className="w-full object-cover"
+              priority
+            />
             <div className="absolute inset-0 bg-black/30 dark:bg-black/50 p-4 flex flex-col justify-between text-white">
               <div>
                 <h2 className="text-lg font-semibold">Organic Chips</h2>
@@ -38,7 +53,14 @@ const AD: React.FC = () => {
 
           {/* Card 3 */}
           <div className="relative rounded-lg overflow-hidden shadow-md transform transition duration-300 hover:scale-105 hover:shadow-xl bg-white dark:bg-gray-900">
-            <img src="/banana.png" alt="Banana" className="w-full h-48 object-cover" />
+            <Image
+              src="/banana.png"
+              alt="Banana"
+              width={400}
+              height={192}
+              className="w-full object-cover"
+              priority
+            />
             <div className="absolute inset-0 bg-black/30 dark:bg-black/50 p-4 flex flex-col justify-between text-white">
               <div>
                 <h2 className="text-lg font-semibold">Fresh Bananas</h2>
@@ -54,7 +76,14 @@ const AD: React.FC = () => {
         {/* Right side - big card */}
         <div className="flex-1">
           <div className="relative h-full rounded-lg overflow-hidden shadow-md transform transition duration-300 hover:scale-105 hover:shadow-xl bg-white dark:bg-gray-900">
-            <img src="/basket.png" alt="Fruit Basket" className="w-full h-full object-cover" />
+            <Image
+              src="/basket.png"
+              alt="Fruit Basket"
+              width={600}   // Wider because it’s the big card
+              height={480}  // Example aspect ratio
+              className="w-full object-cover h-full"
+              priority
+            />
             <div className="absolute inset-0 bg-black/30 dark:bg-black/50 p-6 flex flex-col justify-between text-white">
               <div>
                 <h2 className="text-2xl font-bold">Mixed Fruit Basket</h2>
