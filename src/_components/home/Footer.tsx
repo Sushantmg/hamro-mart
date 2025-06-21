@@ -80,7 +80,7 @@ export default function Footer() {
                     </h2>
                   </div>
                   <p className="text-sm text-gray-600 dark:text-gray-300 italic">
-                    “Be who you are and say what you feel, because those who mind don't matter, and those who matter don't mind.”
+                    “Be who you are and say what you feel, because those who mind don&apos;t matter, and those who matter don&apos;t mind.”
                   </p>
                   <div className="flex space-x-3 mt-5">
                     <a href="#" className="bg-gray-200 dark:bg-gray-800 p-2 rounded-full hover:scale-110 transition transform duration-300 animate-bounce delay-100"><FaFacebookF /></a>
@@ -94,7 +94,7 @@ export default function Footer() {
                   <h3 className="text-xl font-semibold mb-4 border-b border-gray-400 dark:border-gray-600 w-fit pb-1">Useful Links</h3>
                   <ul className="space-y-3 text-sm text-gray-600 dark:text-gray-300">
                     <li className="flex items-center gap-2"><BsFillPinMapFill className="text-green-500" /> Help Center</li>
-                    <li className="flex items-center gap-2"><BsFillPinMapFill className="text-green-500" /> Terms & Conditions</li>
+                    <li className="flex items-center gap-2"><BsFillPinMapFill className="text-green-500" /> Terms &amp; Conditions</li>
                     <li className="flex items-center gap-2"><BsFillPinMapFill className="text-green-500" /> Privacy Policy</li>
                     <li className="flex items-center gap-2"><BsFillPinMapFill className="text-green-500" /> Refund Policy</li>
                     <li className="flex items-center gap-2"><FaPhoneAlt className="text-green-500" /> +977 9814149723</li>
@@ -139,7 +139,7 @@ export default function Footer() {
                         </h2>
                       </div>
                       <p className="text-sm text-gray-600 dark:text-gray-300 italic">
-                        “Be who you are and say what you feel, because those who mind don't matter, and those who matter don't mind.”
+                        “Be who you are and say what you feel, because those who mind don&apos;t matter, and those who matter don&apos;t mind.”
                       </p>
                       <div className="flex space-x-3 mt-5">
                         <a href="#" className="bg-gray-200 dark:bg-gray-800 p-2 rounded-full hover:scale-110 transition transform duration-300 animate-bounce delay-100"><FaFacebookF /></a>
@@ -153,7 +153,7 @@ export default function Footer() {
                       <h3 className="text-xl font-semibold mb-4 border-b border-gray-400 dark:border-gray-600 w-fit pb-1">Useful Links</h3>
                       <ul className="space-y-3 text-sm text-gray-600 dark:text-gray-300">
                         <li className="flex items-center gap-2"><BsFillPinMapFill className="text-green-500" /> Help Center</li>
-                        <li className="flex items-center gap-2"><BsFillPinMapFill className="text-green-500" /> Terms & Conditions</li>
+                        <li className="flex items-center gap-2"><BsFillPinMapFill className="text-green-500" /> Terms &amp; Conditions</li>
                         <li className="flex items-center gap-2"><BsFillPinMapFill className="text-green-500" /> Privacy Policy</li>
                         <li className="flex items-center gap-2"><BsFillPinMapFill className="text-green-500" /> Refund Policy</li>
                         <li className="flex items-center gap-2"><FaPhoneAlt className="text-green-500" /> +977 9814149723</li>
@@ -188,7 +188,7 @@ export default function Footer() {
         <div className="flex space-x-4 mt-4 md:mt-0">
           <Image
             src="/copyrightsymbol.jpg"
-            alt="Visa Electron"
+            alt="Visa Electron Logo"
             width={100}
             height={24}
             className="h-6 w-auto"
