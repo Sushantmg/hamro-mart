@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import Cookies from "js-cookie";
@@ -15,7 +16,7 @@ export default function LoginForm() {
   useEffect(() => {
     const token = Cookies.get("ecom-token");
     if (token) {
-      setIsLoggedIn(true); // Show logout button instead of login form
+      setIsLoggedIn(true);
     }
   }, []);
 
@@ -40,7 +41,7 @@ export default function LoginForm() {
   const handleLogout = () => {
     Cookies.remove("ecom-token");
     toast.success("Logged out!");
-    setIsLoggedIn(false); // Show the login form again
+    setIsLoggedIn(false);
     setEmail("");
     setPassword("");
   };
@@ -49,10 +50,12 @@ export default function LoginForm() {
     <div className="flex min-h-screen flex-1 flex-col justify-center px-6 py-12 lg:px-8 bg-gradient-to-b from-green-100 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-500">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
         <Link href="/">
-          <img
+          <Image
             alt="Your Company"
             src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=green&shade=600"
-            className="mx-auto h-10 w-auto"
+            width={40}
+            height={40}
+            className="mx-auto"
           />
         </Link>
         <h2 className="mt-10 text-center text-3xl font-bold text-green-500 dark:text-green-300">
@@ -82,6 +85,7 @@ export default function LoginForm() {
               </label>
               <div className="mt-2">
                 <input
+                  id="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   type="email"
@@ -93,16 +97,15 @@ export default function LoginForm() {
             </div>
 
             <div>
-              <div className="flex items-center justify-between">
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  Password
-                </label>
-              </div>
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Password
+              </label>
               <div className="mt-2">
                 <input
+                  id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   type="password"
@@ -116,7 +119,10 @@ export default function LoginForm() {
             <div>
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white py-2 rounded-lg focus:ring-2 focus:ring-green-600 transition-all duration-300"
+                disabled={!email || !password}
+                className={`w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white py-2 rounded-lg focus:ring-2 focus:ring-green-600 transition-all duration-300 ${
+                  !email || !password ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               >
                 Sign in
               </button>
