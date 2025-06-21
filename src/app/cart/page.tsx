@@ -1,6 +1,7 @@
 "use client";
 
 import React, { JSX } from "react";
+import Image from "next/image";
 import { useCart } from "@/context/CartContext";
 import { Product } from "@/context/CartContext";
 import { ShoppingBagIcon } from "@heroicons/react/24/outline";
@@ -43,17 +44,22 @@ export default function Cart(): JSX.Element {
                 key={item.id}
                 className="bg-white dark:bg-gray-800 rounded-xl shadow p-4 flex flex-col items-center hover:shadow-lg transition-shadow duration-300"
               >
-                <img
-                  src={item.image}
-                  alt={item.title || "Product image"}
-                  className="w-full h-32 object-cover rounded mb-2"
-                />
+                <div className="relative w-full h-32 mb-2 rounded overflow-hidden">
+                  <Image
+                    src={item.image}
+                    alt={item.title || "Product image"}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 25vw"
+                    style={{ objectFit: "cover" }}
+                    priority={false}
+                  />
+                </div>
                 <h4 className="text-green-800 dark:text-green-300 font-semibold text-lg text-center">
                   {item.title}
                 </h4>
                 <p className="text-gray-600 dark:text-gray-300">Qty: {item.quantity}</p>
                 <p className="text-gray-800 dark:text-gray-200 font-medium">
-                  Price: ${((item.discountedPrice ?? item.price) * (item.quantity || 1)).toFixed(2)}
+                  Price: ${( (item.discountedPrice ?? item.price) * (item.quantity || 1) ).toFixed(2)}
                 </p>
                 <button
                   onClick={() => removeFromCart(item.id)}
@@ -72,7 +78,8 @@ export default function Cart(): JSX.Element {
             </p>
             <button
               type="button"
-              className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium text-base transition-all duration-200"
+              className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium text-base transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={cart.length === 0}
             >
               Go to Checkout
             </button>
