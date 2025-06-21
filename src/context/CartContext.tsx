@@ -14,7 +14,7 @@ export type Product = {
   price: number;
   discountedPrice?: number | null;
   quantity?: number;
-  [key: string]: any;
+  [key: string]: any | unknown;
 };
 
 type CartContextType = {
