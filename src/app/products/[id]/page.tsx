@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import Image from "next/image";
 import { useCart } from "@/context/CartContext";
 import toast from "react-hot-toast";
 
@@ -16,14 +17,13 @@ interface Product {
   discountedPrice: number | null;
 }
 
-// Define the API response shape for better typing
 interface RawProduct {
   id: number;
   name: string;
   category: string;
   image: string;
   desc: string;
-  price: number | string;  // sometimes APIs return numbers as strings
+  price: number | string;
   discount: number;
 }
 
@@ -64,11 +64,16 @@ export default function ProductDetailsPage() {
   return (
     <div className="p-6 max-w-4xl mx-auto bg-white dark:bg-gray-900 rounded-xl shadow mt-20">
       <div className="grid md:grid-cols-2 gap-6 items-start">
-        <img
-          src={product.image}
-          alt={product.title}
-          className="w-full h-80 object-cover rounded-lg shadow-md"
-        />
+        <div className="relative w-full h-80 rounded-lg shadow-md overflow-hidden">
+          <Image
+            src={product.image}
+            alt={product.title}
+            fill
+            style={{ objectFit: "cover" }}
+            sizes="(max-width: 768px) 100vw, 50vw"
+            priority={false}
+          />
+        </div>
         <div className="space-y-4">
           <h1 className="text-3xl font-bold text-green-700 dark:text-green-300">{product.title}</h1>
           <p className="text-gray-600 dark:text-gray-300">{product.description}</p>
@@ -91,6 +96,7 @@ export default function ProductDetailsPage() {
               toast.success(`${product.title} added to cart!`);
             }}
             className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm transition"
+            aria-label={`Add ${product.title} to cart`}
           >
             Add to Cart
           </button>
