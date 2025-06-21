@@ -1,4 +1,3 @@
-// app/products/[id]/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -17,17 +16,29 @@ interface Product {
   discountedPrice: number | null;
 }
 
+// Define the API response shape for better typing
+interface RawProduct {
+  id: number;
+  name: string;
+  category: string;
+  image: string;
+  desc: string;
+  price: number | string;  // sometimes APIs return numbers as strings
+  discount: number;
+}
+
 export default function ProductDetailsPage() {
-  const { id } = useParams(); // get the product ID from the URL
+  const { id } = useParams();
   const [product, setProduct] = useState<Product | null>(null);
   const { addToCart } = useCart();
 
   useEffect(() => {
     fetch(`http://localhost:3007/products/${id}`)
       .then((res) => res.json())
-      .then((item) => {
+      .then((item: RawProduct) => {
+        const priceNum = typeof item.price === "string" ? parseFloat(item.price) : item.price;
         const discountedPrice = item.discount
-          ? parseFloat((item.price - (item.price * item.discount) / 100).toFixed(2))
+          ? parseFloat((priceNum - (priceNum * item.discount) / 100).toFixed(2))
           : null;
 
         setProduct({
@@ -36,7 +47,7 @@ export default function ProductDetailsPage() {
           category: item.category,
           image: item.image,
           description: item.desc,
-          price: parseFloat(item.price),
+          price: priceNum,
           discount: item.discount,
           discountedPrice,
         });
