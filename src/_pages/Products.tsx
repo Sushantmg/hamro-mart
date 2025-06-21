@@ -11,9 +11,8 @@ interface Product {
   description: string;
   price: number;
   discount: number;
-  discountedPrice: number;
+  discountedPrice: number | null;
 }
-
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -66,11 +65,13 @@ export default function ProductsPage() {
     }
     if (sortOrder === "asc") {
       tempProducts.sort(
-        (a, b) => (a.discountedPrice ?? a.price) - (b.discountedPrice ?? b.price)
+        (a, b) =>
+          (a.discountedPrice ?? a.price) - (b.discountedPrice ?? b.price)
       );
     } else if (sortOrder === "desc") {
       tempProducts.sort(
-        (a, b) => (b.discountedPrice ?? b.price) - (a.discountedPrice ?? a.price)
+        (a, b) =>
+          (b.discountedPrice ?? b.price) - (a.discountedPrice ?? a.price)
       );
     }
 
@@ -124,56 +125,57 @@ export default function ProductsPage() {
 
       {/* Products grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filteredProducts.map((product) => (
-  <div
-    key={product.id}
-    className="bg-white dark:bg-gray-800 rounded-xl shadow p-4 flex flex-col items-center hover:scale-105 transition-all transform duration-150"
-  >
-    <Link href={`/products/${product.id}`} className="w-full block">
-      <img
-        src={product.image}
-        alt={product.title}
-        loading="lazy"
-        className="w-full h-40 object-cover rounded mb-3"
-      />
-      <h3 className="text-lg font-bold text-green-700 dark:text-green-300 mb-1 text-center">
-        {product.title}
-      </h3>
-      <p className="text-sm text-gray-600 dark:text-gray-300 text-center mb-2">
-        {product.description}
-      </p>
-    </Link>
+        {filteredProducts.map((product) => (
+          <div
+            key={product.id}
+            className="bg-white dark:bg-gray-800 rounded-xl shadow p-4 flex flex-col items-center hover:scale-105 transition-all transform duration-150"
+          >
+            <Link href={`/products/${product.id}`} className="w-full block">
+              <img
+                src={product.image}
+                alt={product.title}
+                loading="lazy"
+                className="w-full h-40 object-cover rounded mb-3"
+              />
+              <h3 className="text-lg font-bold text-green-700 dark:text-green-300 mb-1 text-center">
+                {product.title}
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300 text-center mb-2">
+                {product.description}
+              </p>
+            </Link>
 
-    <div className="mb-2 text-center">
-      {product.discount > 0 ? (
-        <div className="text-sm text-red-600 dark:text-red-400">
-          <span className="line-through mr-2">${product.price.toFixed(2)}</span>
-          <span className="font-bold text-green-800 dark:text-green-200">
-            ${product.discountedPrice?.toFixed(2)}
-          </span>
-          <span className="ml-1 text-xs text-red-500 dark:text-red-300">
-            ({product.discount}% OFF)
-          </span>
-        </div>
-      ) : (
-        <div className="text-green-700 dark:text-green-200 font-semibold text-sm">
-          ${product.price.toFixed(2)}
-        </div>
-      )}
-    </div>
+            <div className="mb-2 text-center">
+              {product.discount > 0 ? (
+                <div className="text-sm text-red-600 dark:text-red-400">
+                  <span className="line-through mr-2">
+                    ${product.price.toFixed(2)}
+                  </span>
+                  <span className="font-bold text-green-800 dark:text-green-200">
+                    ${product.discountedPrice?.toFixed(2)}
+                  </span>
+                  <span className="ml-1 text-xs text-red-500 dark:text-red-300">
+                    ({product.discount}% OFF)
+                  </span>
+                </div>
+              ) : (
+                <div className="text-green-700 dark:text-green-200 font-semibold text-sm">
+                  ${product.price.toFixed(2)}
+                </div>
+              )}
+            </div>
 
-    <button
-      onClick={() => {
-        addToCart(product);
-        toast.success(`${product.title} added to cart!`);
-      }}
-      className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm mt-auto"
-    >
-      Add to Cart
-    </button>
-  </div>
-))}
-
+            <button
+              onClick={() => {
+                addToCart(product);
+                toast.success(`${product.title} added to cart!`);
+              }}
+              className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm mt-auto"
+            >
+              Add to Cart
+            </button>
+          </div>
+        ))}
       </div>
     </div>
   );

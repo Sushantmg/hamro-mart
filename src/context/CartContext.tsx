@@ -13,7 +13,7 @@ export type Product = {
   id: number | string;
   title:string;
   price: number;
-  discountedPrice?: number;
+  discountedPrice?: number | null;
   quantity?: number;
   [key: string]: any; // Allow additional properties
 };
