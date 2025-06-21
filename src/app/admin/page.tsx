@@ -1,12 +1,16 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState, ReactNode } from 'react';
+import React, { useEffect, useState, ReactNode } from "react";
+import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
+import toast from "react-hot-toast";
+
 import {
   ShoppingCartIcon,
   UserGroupIcon,
   TagIcon,
   CubeIcon,
-} from '@heroicons/react/24/outline';
+} from "@heroicons/react/24/outline";
 
 type Product = {
   id: number;
@@ -30,15 +34,25 @@ type StatCardProps = {
 };
 
 export default function Dashboard() {
+  const router = useRouter();
+
   const [products, setProducts] = useState<Product[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const token = Cookies.get("ecom-token");
+
+    if (token !== "admin") {
+      toast.error("Access denied. Admins only.");
+      router.push("/login");
+      return;
+    }
+
     async function fetchData() {
       try {
-        const productRes = await fetch('http://localhost:3007/products');
-        const userRes = await fetch('http://localhost:3007/users');
+        const productRes = await fetch("http://localhost:3007/products");
+        const userRes = await fetch("http://localhost:3007/users");
         const productsData = await productRes.json();
         const usersData = await userRes.json();
 
@@ -46,13 +60,13 @@ export default function Dashboard() {
         setUsers(usersData);
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
         setLoading(false);
       }
     }
 
     fetchData();
-  }, []);
+  }, [router]);
 
   const discountedProducts = products.filter((p) => p.discount > 0);
   const categories = [...new Set(products.map((p) => p.category))];
@@ -109,9 +123,7 @@ function StatCard({ title, value, icon, gradient }: StatCardProps) {
       <div className="flex items-center space-x-4">
         <div className="p-3 bg-white rounded-full shadow-md">{icon}</div>
         <div>
-          <p className="text-sm text-gray-600 font-semibold uppercase">
-            {title}
-          </p>
+          <p className="text-sm text-gray-600 font-semibold uppercase">{title}</p>
           <p className="text-3xl font-extrabold text-gray-800">{value}</p>
         </div>
       </div>

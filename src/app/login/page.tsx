@@ -4,19 +4,20 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-
+import Cookies from "js-cookie";
 
 export default function LoginForm() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem("ecom-token");
-    if (isLoggedIn) {
-      router.push("/");
+    const token = Cookies.get("ecom-token");
+    if (token) {
+      setIsLoggedIn(true); // Show logout button instead of login form
     }
-  }, [router]);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,39 +25,59 @@ export default function LoginForm() {
     if (!email || !password) return;
 
     if (email === "Sus@gmail.com" && password === "1234") {
-      localStorage.setItem("ecom-token", "Sushan's token");
+      Cookies.set("ecom-token", "Sushan's token", { expires: 7 });
       toast.success("Login successful!");
       router.push("/");
     } else if (email === "admin@gmail.com" && password === "1234") {
-      localStorage.setItem("ecom-token", "admin");
+      Cookies.set("ecom-token", "admin", { expires: 7 });
       toast.success("Login successful!");
-      router.push("/admin/dashboard");
+      router.push("/admin");
     } else {
       toast.error("Wrong credentials");
     }
   };
 
-  return (
-    <>
-      
-      <div className="flex min-h-screen flex-1 flex-col justify-center px-6 py-12 lg:px-8 bg-gradient-to-b from-green-100 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-500">
-        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <Link href="/">
-            <img
-              alt="Your Company"
-              src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=green&shade=600"
-              className="mx-auto h-10 w-auto"
-            />
-          </Link>
-          <h2 className="mt-10 text-center text-3xl font-bold text-green-500 dark:text-green-300">
-            Sign in to your account
-          </h2>
-        </div>
+  const handleLogout = () => {
+    Cookies.remove("ecom-token");
+    toast.success("Logged out!");
+    setIsLoggedIn(false); // Show the login form again
+    setEmail("");
+    setPassword("");
+  };
 
-        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form onSubmit={handleSubmit} className="space-y-6 bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg">
+  return (
+    <div className="flex min-h-screen flex-1 flex-col justify-center px-6 py-12 lg:px-8 bg-gradient-to-b from-green-100 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-500">
+      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+        <Link href="/">
+          <img
+            alt="Your Company"
+            src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=green&shade=600"
+            className="mx-auto h-10 w-auto"
+          />
+        </Link>
+        <h2 className="mt-10 text-center text-3xl font-bold text-green-500 dark:text-green-300">
+          {isLoggedIn ? "You are already logged in" : "Sign in to your account"}
+        </h2>
+      </div>
+
+      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+        {isLoggedIn ? (
+          <button
+            onClick={handleLogout}
+            className="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg shadow-lg transition-all duration-300"
+          >
+            Logout
+          </button>
+        ) : (
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-6 bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg"
+          >
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
                 Email address
               </label>
               <div className="mt-2">
@@ -73,14 +94,12 @@ export default function LoginForm() {
 
             <div>
               <div className="flex items-center justify-between">
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
                   Password
                 </label>
-                <div className="text-sm">
-                  <a href="#" className="font-semibold text-green-500 hover:text-green-400">
-                    Forgot password?
-                  </a>
-                </div>
               </div>
               <div className="mt-2">
                 <input
@@ -103,7 +122,9 @@ export default function LoginForm() {
               </button>
             </div>
           </form>
+        )}
 
+        {!isLoggedIn && (
           <p className="mt-10 text-center text-sm text-gray-500 dark:text-gray-400">
             Not a member?{" "}
             <a
@@ -113,8 +134,8 @@ export default function LoginForm() {
               Start a 14-day free trial
             </a>
           </p>
-        </div>
+        )}
       </div>
-    </>
+    </div>
   );
 }
