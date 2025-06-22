@@ -12,12 +12,17 @@ interface Product {
   discount: number;
 }
 
-export async function GET(_: Request, { params }: { params: { id: string } }) {
+export async function GET(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  const { id } = params;
+
   const filePath = path.join(process.cwd(), "data", "db.json");
   const jsonData = await fs.readFile(filePath, "utf-8");
-  const data = JSON.parse(jsonData);
+  const data: { products: Product[] } = JSON.parse(jsonData);
 
-  const product = data.products.find((p: Product) => p.id === parseInt(params.id));
+  const product = data.products.find((p) => p.id === parseInt(id, 10));
 
   if (!product) {
     return NextResponse.json({ error: "Product not found" }, { status: 404 });
