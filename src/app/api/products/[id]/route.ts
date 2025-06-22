@@ -1,3 +1,4 @@
+import { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import path from "path";
 import { promises as fs } from "fs";
@@ -12,9 +13,8 @@ interface Product {
   discount: number;
 }
 
-// The GET function has a typed context parameter that includes params
 export async function GET(
-  request: Request,
+  request: NextRequest,
   context: { params: { id: string } }
 ) {
   const { id } = context.params;
