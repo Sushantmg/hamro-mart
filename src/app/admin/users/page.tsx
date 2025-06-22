@@ -20,7 +20,7 @@ export default function ManageUsers() {
   useEffect(() => {
     async function fetchUsers() {
       try {
-        const res = await fetch('http://localhost:3007/users');
+        const res = await fetch('/api/users'); // ✅ Changed here
         const data = await res.json();
         setUsers(data);
       } catch (err) {

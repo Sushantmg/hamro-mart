@@ -36,33 +36,34 @@ export default function ProductsPage() {
 
   const { addToCart } = useCart();
 
-  useEffect(() => {
-    fetch('http://localhost:3007/products')
-      .then((res) => res.json())
-      .then((data: ApiProduct[]) => {
-        const updatedData: Product[] = data.map((item) => {
-          const priceNum = Number(item.price);
-          const discountedPrice = item.discount
-            ? parseFloat(((priceNum * (100 - item.discount)) / 100).toFixed(2))
-            : null;
+useEffect(() => {
+  fetch('/api/products')  // <-- updated here
+    .then((res) => res.json())
+    .then((data: ApiProduct[]) => {
+      const updatedData: Product[] = data.map((item) => {
+        const priceNum = Number(item.price);
+        const discountedPrice = item.discount
+          ? parseFloat(((priceNum * (100 - item.discount)) / 100).toFixed(2))
+          : null;
 
-          return {
-            id: item.id,
-            title: `Fresh ${item.name}`,
-            category: item.category,
-            image: item.image,
-            description: item.desc,
-            price: priceNum,
-            discount: item.discount,
-            discountedPrice,
-          };
-        });
+        return {
+          id: item.id,
+          title: `Fresh ${item.name}`,
+          category: item.category,
+          image: item.image,
+          description: item.desc,
+          price: priceNum,
+          discount: item.discount,
+          discountedPrice,
+        };
+      });
 
-        setProducts(updatedData);
-        setFilteredProducts(updatedData);
-      })
-      .catch((err) => console.error('Failed to fetch products:', err));
-  }, []);
+      setProducts(updatedData);
+      setFilteredProducts(updatedData);
+    })
+    .catch((err) => console.error('Failed to fetch products:', err));
+}, []);
+
 
   const filterSortSearchProducts = useCallback(() => {
     let tempProducts = [...products];

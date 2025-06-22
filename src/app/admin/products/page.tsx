@@ -16,7 +16,7 @@ export default function ManageProducts() {
   useEffect(() => {
     async function fetchProducts() {
       try {
-        const res = await fetch('http://localhost:3007/products');
+        const res = await fetch('/api/products'); // ✅ fixed here
         const data = await res.json();
         setProducts(data);
       } catch (error) {

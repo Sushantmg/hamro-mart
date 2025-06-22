@@ -33,7 +33,7 @@ export default function ProductDetailsPage() {
   const { addToCart } = useCart();
 
   useEffect(() => {
-    fetch(`http://localhost:3007/products/${id}`)
+    fetch(`/api/products/${id}`) // ✅ updated here
       .then((res) => res.json())
       .then((item: RawProduct) => {
         const priceNum = typeof item.price === "string" ? parseFloat(item.price) : item.price;

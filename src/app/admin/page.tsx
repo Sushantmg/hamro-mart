@@ -51,8 +51,8 @@ export default function Dashboard() {
 
     async function fetchData() {
       try {
-        const productRes = await fetch("http://localhost:3007/products");
-        const userRes = await fetch("http://localhost:3007/users");
+        const productRes = await fetch("/api/products");
+        const userRes = await fetch("/api/users");
         const productsData = await productRes.json();
         const usersData = await userRes.json();
 
