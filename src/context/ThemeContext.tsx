@@ -12,7 +12,7 @@ export const ThemeContext = createContext<ThemeContextType | undefined>(undefine
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [darkMode, setDarkMode] = useState(false);
 
-  // Read localStorage on mount
+
   useEffect(() => {
     const theme = localStorage.getItem('theme');
     setDarkMode(theme === 'dark');
