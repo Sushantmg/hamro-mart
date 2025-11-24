@@ -1,14 +1,15 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
 import { useState, useEffect } from "react";
-import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
 import Cookies from "js-cookie";
+import toast from "react-hot-toast";
 
-export default function LoginForm() {
+export default function LoginPage() {
   const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -20,34 +21,44 @@ export default function LoginForm() {
     }
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!email || !password) return;
 
-    if (email === "Sus@gmail.com" && password === "1234") {
-      Cookies.set("ecom-token", "Sushan's token", { expires: 7 });
-      toast.success("Login successful!");
-      router.push("/");
-    } else if (email === "admin@gmail.com" && password === "1234") {
-      Cookies.set("ecom-token", "admin", { expires: 7 });
-      toast.success("Login successful!");
-      router.push("/admin");
-    } else {
-      toast.error("Wrong credentials");
+    try {
+      const res = await fetch("http://localhost:3005/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        console.log("login form failed")
+        return;
+      }
+
+      // Save token in cookie
+      Cookies.set("ecom-token", data.token, { expires: 7 });
+      console.log("login successfull")
+      router.push("/"); // redirect to home page
+    } catch (err) {
+      console.log("login error")
     }
   };
 
   const handleLogout = () => {
     Cookies.remove("ecom-token");
-    toast.success("Logged out!");
     setIsLoggedIn(false);
     setEmail("");
     setPassword("");
+    toast.success("Logged out!");
   };
 
   return (
-    <div className="flex min-h-screen flex-1 flex-col justify-center px-6 py-12 lg:px-8 bg-gradient-to-b from-green-100 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-500">
+    <div className="flex min-h-screen flex-col justify-center px-6 py-12 lg:px-8 bg-gradient-to-b from-green-100 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-500">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
         <Link href="/">
           <Image
@@ -58,6 +69,7 @@ export default function LoginForm() {
             className="mx-auto"
           />
         </Link>
+
         <h2 className="mt-10 text-center text-3xl font-bold text-green-500 dark:text-green-300">
           {isLoggedIn ? "You are already logged in" : "Sign in to your account"}
         </h2>
@@ -73,9 +85,10 @@ export default function LoginForm() {
           </button>
         ) : (
           <form
-            onSubmit={handleSubmit}
+            onSubmit={handleLogin}
             className="space-y-6 bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg"
           >
+            {/* Email */}
             <div>
               <label
                 htmlFor="email"
@@ -86,9 +99,9 @@ export default function LoginForm() {
               <div className="mt-2">
                 <input
                   id="email"
+                  type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  type="email"
                   required
                   autoComplete="email"
                   className="block w-full rounded-md bg-white dark:bg-gray-700 px-4 py-2 text-base text-gray-900 dark:text-white focus:ring-2 focus:ring-green-600"
@@ -96,6 +109,7 @@ export default function LoginForm() {
               </div>
             </div>
 
+            {/* Password */}
             <div>
               <label
                 htmlFor="password"
@@ -106,9 +120,9 @@ export default function LoginForm() {
               <div className="mt-2">
                 <input
                   id="password"
+                  type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  type="password"
                   required
                   autoComplete="current-password"
                   className="block w-full rounded-md bg-white dark:bg-gray-700 px-4 py-2 text-base text-gray-900 dark:text-white focus:ring-2 focus:ring-green-600"
@@ -116,6 +130,7 @@ export default function LoginForm() {
               </div>
             </div>
 
+            {/* Submit */}
             <div>
               <button
                 type="submit"
@@ -133,12 +148,9 @@ export default function LoginForm() {
         {!isLoggedIn && (
           <p className="mt-10 text-center text-sm text-gray-500 dark:text-gray-400">
             Not a member?{" "}
-            <a
-              href="#"
-              className="font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300"
-            >
+            <Link href="/register" className="text-blue-700">
               Start a 14-day free trial
-            </a>
+            </Link>
           </p>
         )}
       </div>
