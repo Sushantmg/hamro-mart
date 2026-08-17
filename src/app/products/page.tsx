@@ -1,9 +1,5 @@
-import React from 'react'
+import ProductsPage from "@/_pages/Products";
 
-function page() {
-  return (
-    <div>page</div>
-  )
+export default function Products() {
+  return <ProductsPage />;
 }
-
-export default page
