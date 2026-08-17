@@ -27,7 +27,7 @@ export default function LoginPage() {
     if (!email || !password) return;
 
     try {
-      const res = await fetch("http://localhost:3005/auth/login", {
+      const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -44,7 +44,7 @@ export default function LoginPage() {
       Cookies.set("ecom-token", data.token, { expires: 7 });
       console.log("login successfull")
       router.push("/"); // redirect to home page
-    } catch (err) {
+    } catch {
       console.log("login error")
     }
   };
