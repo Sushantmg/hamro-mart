@@ -3,13 +3,14 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { WishlistProvider } from "@/context/WishlistContext";
 import Navbar from "@/_components/Navbar";
 import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
-  display: "swap", // Optional: improves perceived performance
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
@@ -34,9 +35,12 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeProvider>
-          <Navbar/>
-          <CartProvider>{children}
-            <Toaster/>
+          <CartProvider>
+            <WishlistProvider>
+              <Navbar />
+              {children}
+              <Toaster />
+            </WishlistProvider>
           </CartProvider>
         </ThemeProvider>
       </body>

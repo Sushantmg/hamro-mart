@@ -11,15 +11,19 @@ import {
   XMarkIcon,
   UserIcon,
   ShieldCheckIcon,
+  HeartIcon,
+  UserCircleIcon,
 } from "@heroicons/react/24/outline";
 import { FiShoppingBag } from "react-icons/fi";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Searchbar from "./Searchbar";
 import { useThemeContext } from "../context/ThemeContext";
+import { useCart } from "../context/CartContext";
 
 const Navbar = () => {
   const { darkMode, toggleTheme } = useThemeContext();
+  const { totalItems } = useCart();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [showLogoutTooltip, setShowLogoutTooltip] = useState(false);
@@ -33,7 +37,6 @@ const Navbar = () => {
   }, []);
 
   const handleLogout = () => {
- 
     Cookies.remove("ecom-token");
     setIsLoggedIn(false);
     setMobileMenuOpen(false);
@@ -54,17 +57,25 @@ const Navbar = () => {
       </div>
 
       {/* Desktop Menu Items */}
-      <div className="hidden md:flex items-center space-x-6">
+      <div className="hidden md:flex items-center space-x-5">
         <div className="flex items-center space-x-1 text-sm">
           <PhoneIcon className="h-6 w-6" strokeWidth={2} />
           <span className="text-gray-600 dark:text-white">9814149723</span>
         </div>
 
-        <Link href="/cart">
-          <ShoppingCartIcon
-            className="h-6 w-6 hover:text-green-500 dark:hover:text-green-400 cursor-pointer"
-            strokeWidth={2}
-          />
+        {isLoggedIn && !isAdmin && (
+          <Link href="/wishlist" className="relative" title="Wishlist">
+            <HeartIcon className="h-6 w-6 hover:text-green-500 dark:hover:text-green-400 cursor-pointer" strokeWidth={2} />
+          </Link>
+        )}
+
+        <Link href="/cart" className="relative" title="Cart">
+          <ShoppingCartIcon className="h-6 w-6 hover:text-green-500 dark:hover:text-green-400 cursor-pointer" strokeWidth={2} />
+          {totalItems > 0 && (
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+              {totalItems}
+            </span>
+          )}
         </Link>
 
         {isAdmin && (
@@ -78,22 +89,29 @@ const Navbar = () => {
         )}
 
         {isLoggedIn ? (
-          <div
-            className="relative"
-            onMouseEnter={() => setShowLogoutTooltip(true)}
-            onMouseLeave={() => setShowLogoutTooltip(false)}
-          >
-            <UserIcon
-              onClick={handleLogout}
-              className="h-6 w-6 hover:text-green-500 dark:hover:text-green-400 cursor-pointer"
-              strokeWidth={2}
-              title="Log out"
-            />
-            {showLogoutTooltip && (
-              <div className="absolute top-full mt-1 left-1/2 -translate-x-1/2 bg-gray-700 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10">
-                Log out
-              </div>
+          <div className="flex items-center space-x-3">
+            {!isAdmin && (
+              <Link href="/profile" title="Profile">
+                <UserCircleIcon className="h-6 w-6 hover:text-green-500 dark:hover:text-green-400 cursor-pointer" strokeWidth={2} />
+              </Link>
             )}
+            <div
+              className="relative"
+              onMouseEnter={() => setShowLogoutTooltip(true)}
+              onMouseLeave={() => setShowLogoutTooltip(false)}
+            >
+              <UserIcon
+                onClick={handleLogout}
+                className="h-6 w-6 hover:text-green-500 dark:hover:text-green-400 cursor-pointer"
+                strokeWidth={2}
+                title="Log out"
+              />
+              {showLogoutTooltip && (
+                <div className="absolute top-full mt-1 left-1/2 -translate-x-1/2 bg-gray-700 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10">
+                  Log out
+                </div>
+              )}
+            </div>
           </div>
         ) : (
           <Link
@@ -159,13 +177,46 @@ const Navbar = () => {
             </Link>
           )}
 
+          {isLoggedIn && !isAdmin && (
+            <Link
+              href="/profile"
+              className="flex items-center space-x-2 hover:text-green-500 dark:hover:text-green-400"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <UserCircleIcon className="h-6 w-6" strokeWidth={2} />
+              <span>Profile</span>
+            </Link>
+          )}
+
+          {isLoggedIn && !isAdmin && (
+            <Link
+              href="/wishlist"
+              className="flex items-center space-x-2 hover:text-green-500 dark:hover:text-green-400"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <HeartIcon className="h-6 w-6" strokeWidth={2} />
+              <span>Wishlist</span>
+            </Link>
+          )}
+
+          {isLoggedIn && !isAdmin && (
+            <Link
+              href="/orders"
+              className="flex items-center space-x-2 hover:text-green-500 dark:hover:text-green-400"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <ShoppingCartIcon className="h-6 w-6" strokeWidth={2} />
+              <span>Orders</span>
+            </Link>
+          )}
+
           <Link
             href="/cart"
             className="flex items-center space-x-2 hover:text-green-500 dark:hover:text-green-400"
             onClick={() => setMobileMenuOpen(false)}
           >
             <ShoppingCartIcon className="h-6 w-6" strokeWidth={2} />
-            <span>Cart</span>
+            <span>Cart {totalItems > 0 && `(${totalItems})`}</span>
           </Link>
 
           {isAdmin && (
