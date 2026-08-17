@@ -194,10 +194,9 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Test Credentials
 
-| Role | Email | Password |
-|------|-------|----------|
-| Admin | admin@hamromart.com | admin123 |
-| User | sus@gmail.com | 1234 |
-| User | testuser1@example.com | pass123 |
-| User | alice@example.com | alice123 |
-| User | bob@example.com | bobsecure |
+| Email | Password |
+|-------|----------|
+| sus@gmail.com | 1234 |
+| testuser1@example.com | pass123 |
+| alice@example.com | alice123 |
+| bob@example.com | bobsecure |
