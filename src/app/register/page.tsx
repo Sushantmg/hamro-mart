@@ -22,7 +22,7 @@ export default function RegisterForm() {
     }
 
     try {
-      const res = await fetch("http://localhost:3005/auth/signup", {
+      const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -39,7 +39,7 @@ export default function RegisterForm() {
 
       toast.success("Signup successful");
       router.push("/login");
-    } catch (error) {
+    } catch {
       toast.error("Something went wrong");
     }
   };
