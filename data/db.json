@@ -116,5 +116,9 @@
       "password": "diana789",
       "role": "user"
     }
-  ]
+  ],
+  "wishlist": [],
+  "orders": [],
+  "reviews": [],
+  "cart": []
 }
