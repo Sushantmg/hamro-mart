@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import path from "path";
-import { promises as fs } from "fs";
+import { readDB, writeDB } from "@/lib/db";
 
 export async function POST(request: Request) {
   const { name, email, password } = await request.json();
@@ -9,19 +8,19 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "All fields are required" }, { status: 400 });
   }
 
-  const filePath = path.join(process.cwd(), "data", "db.json");
-  const jsonData = await fs.readFile(filePath, "utf-8");
-  const data = JSON.parse(jsonData);
+  const data = await readDB();
 
-  const exists = data.users.find((u: { email: string }) => u.email === email);
+  const exists = data.users.find((u) => u.email === email);
   if (exists) {
     return NextResponse.json({ error: "Email already registered" }, { status: 409 });
   }
 
-  const newUser = { id: data.users.length, email, password, role: "user" };
+  const newId = data.users.length > 0 ? Math.max(...data.users.map((u) => u.id)) + 1 : 0;
+
+  const newUser = { id: newId, email, password, role: "user" as const };
   data.users.push(newUser);
 
-  await fs.writeFile(filePath, JSON.stringify(data, null, 2));
+  await writeDB(data);
 
   return NextResponse.json({ message: "Signup successful" }, { status: 201 });
 }
