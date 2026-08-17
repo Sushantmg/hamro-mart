@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readDB, writeDB } from "@/lib/db";
 
+export async function GET() {
+  const data = await readDB();
+  return NextResponse.json(data.products);
+}
+
 export async function POST(request: NextRequest) {
   const body = await request.json();
   const { name, category, image, desc, price, discount } = body;
