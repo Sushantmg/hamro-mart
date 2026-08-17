@@ -18,7 +18,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Email already registered" }, { status: 409 });
   }
 
-  const newUser = { id: data.users.length, email, password };
+  const newUser = { id: data.users.length, email, password, role: "user" };
   data.users.push(newUser);
 
   await fs.writeFile(filePath, JSON.stringify(data, null, 2));

@@ -21,5 +21,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
   }
 
-  return NextResponse.json({ token: `user-${user.id}`, user: { id: user.id, email: user.email } });
+  const token = user.role === "admin" ? "admin" : `user-${user.id}`;
+
+  return NextResponse.json({ token, user: { id: user.id, email: user.email, role: user.role } });
 }
