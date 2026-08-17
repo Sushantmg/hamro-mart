@@ -43,7 +43,7 @@ export default function LoginPage() {
       // Save token in cookie
       Cookies.set("ecom-token", data.token, { expires: 7 });
       console.log("login successfull")
-      router.push("/"); // redirect to home page
+      router.push(data.token === "admin" ? "/admin" : "/");
     } catch {
       console.log("login error")
     }

@@ -10,6 +10,7 @@ import {
   Bars3Icon,
   XMarkIcon,
   UserIcon,
+  ShieldCheckIcon,
 } from "@heroicons/react/24/outline";
 import { FiShoppingBag } from "react-icons/fi";
 import { useRouter } from "next/navigation";
@@ -20,14 +21,15 @@ import { useThemeContext } from "../context/ThemeContext";
 const Navbar = () => {
   const { darkMode, toggleTheme } = useThemeContext();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [showLogoutTooltip, setShowLogoutTooltip] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    
     const token = Cookies.get("ecom-token");
     setIsLoggedIn(!!token);
+    setIsAdmin(token === "admin");
   }, []);
 
   const handleLogout = () => {
@@ -64,6 +66,16 @@ const Navbar = () => {
             strokeWidth={2}
           />
         </Link>
+
+        {isAdmin && (
+          <Link
+            href="/admin"
+            className="flex items-center space-x-1 hover:text-green-500 dark:hover:text-green-400 cursor-pointer"
+          >
+            <ShieldCheckIcon className="h-6 w-6" strokeWidth={2} />
+            <span className="text-sm font-semibold">Admin</span>
+          </Link>
+        )}
 
         {isLoggedIn ? (
           <div
@@ -155,6 +167,17 @@ const Navbar = () => {
             <ShoppingCartIcon className="h-6 w-6" strokeWidth={2} />
             <span>Cart</span>
           </Link>
+
+          {isAdmin && (
+            <Link
+              href="/admin"
+              className="flex items-center space-x-2 hover:text-green-500 dark:hover:text-green-400"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <ShieldCheckIcon className="h-6 w-6" strokeWidth={2} />
+              <span>Admin Panel</span>
+            </Link>
+          )}
 
           <div className="flex items-center space-x-2 text-sm">
             <PhoneIcon className="h-6 w-6" strokeWidth={2} />
