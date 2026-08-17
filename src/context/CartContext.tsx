@@ -4,6 +4,7 @@ import React, {
   createContext,
   useContext,
   useState,
+  useEffect,
   ReactNode,
   useMemo,
 } from "react";
@@ -39,6 +40,25 @@ export const useCart = (): CartContextType => {
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cart, setCart] = useState<Product[]>([]);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("hamro-cart");
+    if (saved) {
+      try {
+        setCart(JSON.parse(saved));
+      } catch {
+        // ignore invalid data
+      }
+    }
+    setLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (loaded) {
+      localStorage.setItem("hamro-cart", JSON.stringify(cart));
+    }
+  }, [cart, loaded]);
 
   const addToCart = (product: Product) => {
     setCart((prevCart) => {
@@ -69,7 +89,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
-  const clearCart = () => setCart([]);
+  const clearCart = () => {
+    setCart([]);
+    localStorage.removeItem("hamro-cart");
+  };
 
   const totalItems = useMemo(
     () => cart.reduce((sum, item) => sum + (item.quantity ?? 1), 0),
