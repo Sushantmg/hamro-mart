@@ -1,15 +1,18 @@
 "use client";
 
 import { useState, FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 const Searchbar = () => {
   const [query, setQuery] = useState("");
+  const router = useRouter();
 
   const handleSearch = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    alert(`Searching for: ${query}`);
-    // Replace with real search logic or router navigation
+    if (query.trim()) {
+      router.push(`/products?q=${encodeURIComponent(query.trim())}`);
+    }
   };
 
   return (
@@ -19,21 +22,21 @@ const Searchbar = () => {
     >
       <input
         type="text"
-        placeholder="Search"
+        placeholder="Search products..."
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         className="
-          flex-grow 
-          px-4 py-3 
-          rounded-l-lg 
-          border 
-          border-gray-300 
-          focus:outline-none 
-          focus:ring-2 focus:ring-green-500 
-          dark:bg-gray-700 
-          dark:border-gray-600 
+          flex-grow
+          px-4 py-3
+          rounded-l-lg
+          border
+          border-gray-300
+          focus:outline-none
+          focus:ring-2 focus:ring-green-500
+          dark:bg-gray-700
+          dark:border-gray-600
           dark:text-white
-          transition 
+          transition
           duration-200
           hover:border-green-500
         "
@@ -41,11 +44,11 @@ const Searchbar = () => {
       <button
         type="submit"
         className="
-          bg-green-600 
-          hover:bg-green-700 
-          text-white 
-          px-5 py-3 
-          rounded-r-lg 
+          bg-green-600
+          hover:bg-green-700
+          text-white
+          px-5 py-3
+          rounded-r-lg
           flex items-center justify-center
           transition-colors duration-200
         "
