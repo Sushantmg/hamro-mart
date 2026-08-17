@@ -1,21 +1,29 @@
-import { NextResponse } from "next/server";
-import path from "path";
-import { promises as fs } from "fs";
+import { NextRequest, NextResponse } from "next/server";
+import { readDB, writeDB } from "@/lib/db";
 
-interface Product {
-  id: number;
-  name: string;
-  category: string;
-  image: string;
-  desc: string;
-  price: number;
-  discount: number;
-}
+export async function POST(request: NextRequest) {
+  const body = await request.json();
+  const { name, category, image, desc, price, discount } = body;
 
-export async function GET() {
-  const filePath = path.join(process.cwd(), "data", "db.json");
-  const jsonData = await fs.readFile(filePath, "utf-8");
-  const data: { products: Product[] } = JSON.parse(jsonData);
+  if (!name || !category || !price) {
+    return NextResponse.json({ error: "Name, category, and price are required" }, { status: 400 });
+  }
 
-  return NextResponse.json(data.products);
+  const data = await readDB();
+  const newId = data.products.length > 0 ? Math.max(...data.products.map((p) => p.id)) + 1 : 1;
+
+  const newProduct = {
+    id: newId,
+    name,
+    category,
+    image: image || "",
+    desc: desc || "",
+    price: Number(price),
+    discount: Number(discount) || 0,
+  };
+
+  data.products.push(newProduct);
+  await writeDB(data);
+
+  return NextResponse.json(newProduct, { status: 201 });
 }

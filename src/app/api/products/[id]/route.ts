@@ -1,41 +1,59 @@
 import { NextRequest, NextResponse } from "next/server";
-import path from "path";
-import { promises as fs } from "fs";
+import { readDB, writeDB } from "@/lib/db";
 
-interface Product {
-  id: number;
-  name: string;
-  category: string;
-  image: string;
-  desc: string;
-  price: number;
-  discount: number;
-}
-
-export async function GET(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  const segments = pathname.split("/");
-  const idStr = segments[segments.length - 1];
-
-  if (!idStr) {
-    return NextResponse.json({ error: "Product ID is missing" }, { status: 400 });
-  }
-
-  const id = parseInt(idStr, 10);
-
-  if (isNaN(id)) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const productId = parseInt(id, 10);
+  if (isNaN(productId)) {
     return NextResponse.json({ error: "Invalid product ID" }, { status: 400 });
   }
 
-  const filePath = path.join(process.cwd(), "data", "db.json");
-  const jsonData = await fs.readFile(filePath, "utf-8");
-  const data: { products: Product[] } = JSON.parse(jsonData);
-
-  const product = data.products.find((p) => p.id === id);
+  const data = await readDB();
+  const product = data.products.find((p) => p.id === productId);
 
   if (!product) {
     return NextResponse.json({ error: "Product not found" }, { status: 404 });
   }
 
   return NextResponse.json(product);
+}
+
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const productId = parseInt(id, 10);
+  if (isNaN(productId)) {
+    return NextResponse.json({ error: "Invalid product ID" }, { status: 400 });
+  }
+
+  const body = await request.json();
+  const data = await readDB();
+
+  const index = data.products.findIndex((p) => p.id === productId);
+  if (index === -1) {
+    return NextResponse.json({ error: "Product not found" }, { status: 404 });
+  }
+
+  data.products[index] = { ...data.products[index], ...body, id: productId };
+  await writeDB(data);
+
+  return NextResponse.json(data.products[index]);
+}
+
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const productId = parseInt(id, 10);
+  if (isNaN(productId)) {
+    return NextResponse.json({ error: "Invalid product ID" }, { status: 400 });
+  }
+
+  const data = await readDB();
+  const index = data.products.findIndex((p) => p.id === productId);
+  if (index === -1) {
+    return NextResponse.json({ error: "Product not found" }, { status: 404 });
+  }
+
+  data.products.splice(index, 1);
+  await writeDB(data);
+
+  return NextResponse.json({ message: "Product deleted" });
 }
