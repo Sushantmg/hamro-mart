@@ -1,10 +1,14 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState, useCallback } from 'react';
-import Image from 'next/image';
-import { useCart } from '../context/CartContext';
-import toast from 'react-hot-toast';
-import Link from 'next/link';
+import React, { useEffect, useState, useCallback, Suspense } from "react";
+import Image from "next/image";
+import { useSearchParams } from "next/navigation";
+import { useCart } from "../context/CartContext";
+import { useWishlist } from "../context/WishlistContext";
+import toast from "react-hot-toast";
+import Link from "next/link";
+import { HeartIcon } from "@heroicons/react/24/outline";
+import { HeartIcon as HeartSolidIcon } from "@heroicons/react/24/solid";
 
 interface ApiProduct {
   id: number;
@@ -27,66 +31,74 @@ interface Product {
   discountedPrice: number | null;
 }
 
-export default function ProductsPage() {
+function ProductsContent() {
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-  const [sortOrder, setSortOrder] = useState<string>('');
-  const [categoryFilter, setCategoryFilter] = useState<string>('all');
-  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [sortOrder, setSortOrder] = useState<string>("");
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [loading, setLoading] = useState(true);
+  const searchParams = useSearchParams();
 
   const { addToCart } = useCart();
+  const { isInWishlist, toggleWishlist } = useWishlist();
 
-useEffect(() => {
-  fetch('/api/products')  // <-- updated here
-    .then((res) => res.json())
-    .then((data: ApiProduct[]) => {
-      const updatedData: Product[] = data.map((item) => {
-        const priceNum = Number(item.price);
-        const discountedPrice = item.discount
-          ? parseFloat(((priceNum * (100 - item.discount)) / 100).toFixed(2))
-          : null;
+  useEffect(() => {
+    const q = searchParams.get("q");
+    if (q) setSearchTerm(q);
+  }, [searchParams]);
 
-        return {
-          id: item.id,
-          title: `Fresh ${item.name}`,
-          category: item.category,
-          image: item.image,
-          description: item.desc,
-          price: priceNum,
-          discount: item.discount,
-          discountedPrice,
-        };
-      });
+  useEffect(() => {
+    fetch("/api/products")
+      .then((res) => res.json())
+      .then((data: ApiProduct[]) => {
+        const updatedData: Product[] = data.map((item) => {
+          const priceNum = Number(item.price);
+          const discountedPrice = item.discount
+            ? parseFloat(((priceNum * (100 - item.discount)) / 100).toFixed(2))
+            : null;
 
-      setProducts(updatedData);
-      setFilteredProducts(updatedData);
-    })
-    .catch((err) => console.error('Failed to fetch products:', err));
-}, []);
+          return {
+            id: item.id,
+            title: `Fresh ${item.name}`,
+            category: item.category,
+            image: item.image,
+            description: item.desc,
+            price: priceNum,
+            discount: item.discount,
+            discountedPrice,
+          };
+        });
 
+        setProducts(updatedData);
+        setFilteredProducts(updatedData);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
 
   const filterSortSearchProducts = useCallback(() => {
     let tempProducts = [...products];
 
-    if (categoryFilter !== 'all') {
+    if (categoryFilter !== "all") {
       tempProducts = tempProducts.filter((p) => p.category === categoryFilter);
     }
 
-    if (searchTerm.trim() !== '') {
-      tempProducts = tempProducts.filter((p) =>
-        p.title.toLowerCase().includes(searchTerm.toLowerCase())
+    if (searchTerm.trim() !== "") {
+      tempProducts = tempProducts.filter(
+        (p) =>
+          p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          p.description.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
-    if (sortOrder === 'asc') {
+    if (sortOrder === "asc") {
       tempProducts.sort(
-        (a, b) =>
-          (a.discountedPrice ?? a.price) - (b.discountedPrice ?? b.price)
+        (a, b) => (a.discountedPrice ?? a.price) - (b.discountedPrice ?? b.price)
       );
-    } else if (sortOrder === 'desc') {
+    } else if (sortOrder === "desc") {
       tempProducts.sort(
-        (a, b) =>
-          (b.discountedPrice ?? b.price) - (a.discountedPrice ?? a.price)
+        (a, b) => (b.discountedPrice ?? b.price) - (a.discountedPrice ?? a.price)
       );
     }
 
@@ -97,12 +109,20 @@ useEffect(() => {
     filterSortSearchProducts();
   }, [filterSortSearchProducts]);
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <p className="text-xl text-gray-500 animate-pulse">Loading products...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-green-50 dark:bg-gray-900 p-6 transition-colors duration-300">
       {/* Filters and Search */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-4">
         <h2 className="text-2xl font-semibold text-green-800 dark:text-green-300">
-          Fresh Fruits & Vegetables
+          {searchTerm ? `Results for "${searchTerm}"` : "Fresh Fruits & Vegetables"}
         </h2>
         <div className="flex gap-3 flex-wrap">
           <input
@@ -138,13 +158,34 @@ useEffect(() => {
         </div>
       </div>
 
+      {filteredProducts.length === 0 && (
+        <div className="text-center py-16">
+          <p className="text-gray-500 text-lg">No products found.</p>
+        </div>
+      )}
+
       {/* Products grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {filteredProducts.map((product) => (
           <div
             key={product.id}
-            className="bg-white dark:bg-gray-800 rounded-xl shadow p-4 flex flex-col items-center hover:scale-105 transition-all transform duration-150"
+            className="bg-white dark:bg-gray-800 rounded-xl shadow p-4 flex flex-col items-center hover:scale-105 transition-all transform duration-150 relative"
           >
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                toggleWishlist(product.id);
+                toast.success(isInWishlist(product.id) ? "Removed from wishlist" : "Added to wishlist");
+              }}
+              className="absolute top-2 right-2 z-10 p-1"
+            >
+              {isInWishlist(product.id) ? (
+                <HeartSolidIcon className="h-6 w-6 text-red-500" />
+              ) : (
+                <HeartIcon className="h-6 w-6 text-gray-400 hover:text-red-500" />
+              )}
+            </button>
+
             <Link href={`/products/${product.id}`} className="w-full block">
               <div className="relative w-full h-40 mb-3 rounded overflow-hidden">
                 <Image
@@ -152,7 +193,7 @@ useEffect(() => {
                   alt={product.title}
                   fill
                   sizes="(max-width: 768px) 100vw, 25vw"
-                  style={{ objectFit: 'cover' }}
+                  style={{ objectFit: "cover" }}
                   priority={false}
                 />
               </div>
@@ -168,9 +209,7 @@ useEffect(() => {
             <div className="mb-2 text-center">
               {product.discount > 0 ? (
                 <div className="text-sm text-red-600 dark:text-red-400">
-                  <span className="line-through mr-2">
-                    ${product.price.toFixed(2)}
-                  </span>
+                  <span className="line-through mr-2">${product.price.toFixed(2)}</span>
                   <span className="font-bold text-green-800 dark:text-green-200">
                     ${product.discountedPrice?.toFixed(2)}
                   </span>
@@ -198,5 +237,13 @@ useEffect(() => {
         ))}
       </div>
     </div>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={<div className="flex justify-center items-center min-h-[60vh]"><p className="text-xl text-gray-500 animate-pulse">Loading...</p></div>}>
+      <ProductsContent />
+    </Suspense>
   );
 }
