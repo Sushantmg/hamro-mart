@@ -1,198 +1,125 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import Image from 'next/image';
-import { FaFacebookF, FaTwitter, FaInstagram, FaPhoneAlt, FaEnvelope } from 'react-icons/fa';
-import { BsFillPinMapFill } from 'react-icons/bs';
-import { FiShoppingBag } from 'react-icons/fi';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from "react";
+import Link from "next/link";
+import { FaFacebookF, FaTwitter, FaInstagram } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 export default function Footer() {
-  const [openCard, setOpenCard] = useState<number | null>(null);
+  const [email, setEmail] = useState("");
 
-  const toggleCard = (index: number) => {
-    setOpenCard(openCard === index ? null : index);
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (email.trim()) {
+      toast.success("Thanks for subscribing!");
+      setEmail("");
+    }
   };
-
-  const collapseVariants = {
-    open: { opacity: 1, height: 'auto' },
-    closed: { opacity: 0, height: 0, overflow: 'hidden' }
-  };
-
-  const sectionHeaders = [
-    { icon: <FiShoppingBag className="text-green-500" />, label: "About Us" },
-    { icon: <BsFillPinMapFill className="text-green-500" />, label: "Useful Links" },
-    { icon: <FaEnvelope className="text-green-500" />, label: "Become a Seller" }
-  ];
 
   return (
-    <footer className="bg-gray-100 text-gray-800 dark:bg-[#0e1f33] dark:text-white py-10 px-6 transition-colors duration-300">
+    <footer className="bg-gray-900 text-gray-300">
       {/* Newsletter */}
-      <div className="mb-12">
-        <div className="bg-white dark:bg-[#112b45] border border-gray-300 dark:border-gray-700 rounded-2xl px-6 py-8 shadow-xl max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 sm:space-x-6">
-          <h2 className="text-xl sm:text-2xl font-bold dark:text-white">
-            Subscribe to <span className="text-green-500">Newsletter</span>
-          </h2>
-          <form className="flex w-full sm:w-auto items-center rounded-full overflow-hidden bg-gray-200 dark:bg-white shadow-md">
-            <input
-              type="email"
-              placeholder="Enter your email …"
-              className="flex-1 px-4 py-2 text-sm text-gray-700 outline-none"
-            />
-            <button
-              type="submit"
-              className="bg-green-500 text-white px-5 py-2 text-sm font-semibold flex items-center hover:bg-green-600 transition-all"
-            >
-              Subscribe
-            </button>
-          </form>
+      <div className="border-b border-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div>
+              <h3 className="text-xl font-bold text-white">Stay in the loop</h3>
+              <p className="text-gray-400 text-sm mt-1">Get the latest deals and fresh produce updates</p>
+            </div>
+            <form onSubmit={handleSubscribe} className="flex w-full md:w-auto">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                required
+                className="flex-1 md:w-72 px-4 py-3 rounded-l-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+              />
+              <button type="submit" className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-r-xl font-semibold text-sm transition-colors whitespace-nowrap">
+                Subscribe
+              </button>
+            </form>
+          </div>
         </div>
       </div>
 
-      {/* Grid with cards */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-        {sectionHeaders.map((header, index) => (
-          <div
-            key={index}
-            className="bg-white dark:bg-[#132b45]/80 rounded-2xl p-6 shadow-lg border border-gray-300 dark:border-gray-700 hover:-translate-y-1 hover:shadow-2xl transition-transform duration-300"
-          >
-            <button
-              className="md:hidden w-full text-left text-lg font-semibold mb-4"
-              onClick={() => toggleCard(index)}
-            >
-              <div className="flex items-center justify-between">
-                <span className="flex items-center gap-2">
-                  {header.icon}
-                  <span className="text-green-500">{header.label}</span>
-                </span>
-                <span>{openCard === index ? '−' : '+'}</span>
+      {/* Links */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
+          {/* Brand */}
+          <div className="md:col-span-1">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-9 h-9 bg-emerald-600 rounded-xl flex items-center justify-center">
+                <span className="text-white font-bold text-lg">H</span>
               </div>
-            </button>
-
-            {/* Desktop Content */}
-            <div className="hidden md:block">
-              {index === 0 && (
-                <>
-                  <div className="flex items-center space-x-3 mb-4">
-                    <FiShoppingBag className="text-green-500 text-3xl" />
-                    <h2 className="text-2xl font-bold text-green-500">
-                      HAMRO<span className="text-gray-800 dark:text-white">MART</span>
-                    </h2>
-                  </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-300 italic">
-                    “Be who you are and say what you feel, because those who mind don&apos;t matter, and those who matter don&apos;t mind.”
-                  </p>
-                  <div className="flex space-x-3 mt-5">
-                    <a href="#" className="bg-gray-200 dark:bg-gray-800 p-2 rounded-full hover:scale-110 transition transform duration-300 animate-bounce delay-100"><FaFacebookF /></a>
-                    <a href="#" className="bg-gray-200 dark:bg-gray-800 p-2 rounded-full hover:scale-110 transition transform duration-300 animate-bounce delay-200"><FaTwitter /></a>
-                    <a href="#" className="bg-gray-200 dark:bg-gray-800 p-2 rounded-full hover:scale-110 transition transform duration-300 animate-bounce delay-300"><FaInstagram /></a>
-                  </div>
-                </>
-              )}
-              {index === 1 && (
-                <>
-                  <h3 className="text-xl font-semibold mb-4 border-b border-gray-400 dark:border-gray-600 w-fit pb-1">Useful Links</h3>
-                  <ul className="space-y-3 text-sm text-gray-600 dark:text-gray-300">
-                    <li className="flex items-center gap-2"><BsFillPinMapFill className="text-green-500" /> Help Center</li>
-                    <li className="flex items-center gap-2"><BsFillPinMapFill className="text-green-500" /> Terms &amp; Conditions</li>
-                    <li className="flex items-center gap-2"><BsFillPinMapFill className="text-green-500" /> Privacy Policy</li>
-                    <li className="flex items-center gap-2"><BsFillPinMapFill className="text-green-500" /> Refund Policy</li>
-                    <li className="flex items-center gap-2"><FaPhoneAlt className="text-green-500" /> +977 9814149723</li>
-                    <li className="flex items-center gap-2"><FaEnvelope className="text-green-500" /> info@hamromart.com</li>
-                  </ul>
-                </>
-              )}
-              {index === 2 && (
-                <>
-                  <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-white">
-                    Interested in a Great Way<br />
-                    <span className="text-green-500">Make Money?</span>
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-5">
-                    A supermarket is a self-service shop offering a wide variety of food, beverages and household products.
-                  </p>
-                  <button className="bg-green-500 hover:bg-green-600 text-white font-semibold px-5 py-2 rounded-full transition">
-                    Become a Seller
-                  </button>
-                </>
-              )}
+              <span className="text-xl font-bold text-white">
+                Hamro<span className="text-emerald-400">Mart</span>
+              </span>
             </div>
-
-            {/* Mobile content with animation */}
-            <AnimatePresence initial={false}>
-              {openCard === index && (
-                <motion.div
-                  key="content-mobile"
-                  initial="closed"
-                  animate="open"
-                  exit="closed"
-                  variants={collapseVariants}
-                  transition={{ duration: 0.4, ease: 'easeInOut' }}
-                  className="md:hidden"
-                >
-                  {index === 0 && (
-                    <>
-                      <div className="flex items-center space-x-3 mb-4">
-                        <FiShoppingBag className="text-green-500 text-3xl" />
-                        <h2 className="text-2xl font-bold text-green-500">
-                          HAMRO<span className="text-gray-800 dark:text-white">MART</span>
-                        </h2>
-                      </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-300 italic">
-                        “Be who you are and say what you feel, because those who mind don&apos;t matter, and those who matter don&apos;t mind.”
-                      </p>
-                      <div className="flex space-x-3 mt-5">
-                        <a href="#" className="bg-gray-200 dark:bg-gray-800 p-2 rounded-full hover:scale-110 transition transform duration-300 animate-bounce delay-100"><FaFacebookF /></a>
-                        <a href="#" className="bg-gray-200 dark:bg-gray-800 p-2 rounded-full hover:scale-110 transition transform duration-300 animate-bounce delay-200"><FaTwitter /></a>
-                        <a href="#" className="bg-gray-200 dark:bg-gray-800 p-2 rounded-full hover:scale-110 transition transform duration-300 animate-bounce delay-300"><FaInstagram /></a>
-                      </div>
-                    </>
-                  )}
-                  {index === 1 && (
-                    <>
-                      <h3 className="text-xl font-semibold mb-4 border-b border-gray-400 dark:border-gray-600 w-fit pb-1">Useful Links</h3>
-                      <ul className="space-y-3 text-sm text-gray-600 dark:text-gray-300">
-                        <li className="flex items-center gap-2"><BsFillPinMapFill className="text-green-500" /> Help Center</li>
-                        <li className="flex items-center gap-2"><BsFillPinMapFill className="text-green-500" /> Terms &amp; Conditions</li>
-                        <li className="flex items-center gap-2"><BsFillPinMapFill className="text-green-500" /> Privacy Policy</li>
-                        <li className="flex items-center gap-2"><BsFillPinMapFill className="text-green-500" /> Refund Policy</li>
-                        <li className="flex items-center gap-2"><FaPhoneAlt className="text-green-500" /> +977 9814149723</li>
-                        <li className="flex items-center gap-2"><FaEnvelope className="text-green-500" /> info@hamromart.com</li>
-                      </ul>
-                    </>
-                  )}
-                  {index === 2 && (
-                    <>
-                      <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-white">
-                        Interested in a Great Way<br />
-                        <span className="text-green-500">Make Money?</span>
-                      </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-300 mb-5">
-                        A supermarket is a self-service shop offering a wide variety of food, beverages and household products.
-                      </p>
-                      <button className="bg-green-500 hover:bg-green-600 text-white font-semibold px-5 py-2 rounded-full transition">
-                        Become a Seller
-                      </button>
-                    </>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <p className="text-sm text-gray-400 leading-relaxed mb-4">
+              Your trusted local grocery store. Fresh produce, delivered with care.
+            </p>
+            <div className="flex gap-3">
+              {[FaFacebookF, FaTwitter, FaInstagram].map((Icon, i) => (
+                <a key={i} href="#" className="w-9 h-9 bg-gray-800 hover:bg-emerald-600 rounded-lg flex items-center justify-center transition-colors">
+                  <Icon className="text-sm" />
+                </a>
+              ))}
+            </div>
           </div>
-        ))}
+
+          {/* Quick Links */}
+          <div>
+            <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Quick Links</h4>
+            <ul className="space-y-3 text-sm">
+              {[
+                { label: "Shop All", href: "/products" },
+                { label: "Fruits", href: "/products?category=fruits" },
+                { label: "Vegetables", href: "/products?category=vegetables" },
+                { label: "My Orders", href: "/orders" },
+              ].map((link) => (
+                <li key={link.label}>
+                  <Link href={link.href} className="hover:text-emerald-400 transition-colors">{link.label}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Support */}
+          <div>
+            <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Support</h4>
+            <ul className="space-y-3 text-sm">
+              {["Help Center", "Terms & Conditions", "Privacy Policy", "Refund Policy"].map((item) => (
+                <li key={item}>
+                  <a href="#" className="hover:text-emerald-400 transition-colors">{item}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Contact */}
+          <div>
+            <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Contact</h4>
+            <ul className="space-y-3 text-sm">
+              <li className="flex items-center gap-2">
+                <span className="text-emerald-400">📞</span> +977 9814149723
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="text-emerald-400">✉️</span> info@hamromart.com
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="text-emerald-400">📍</span> Kathmandu, Nepal
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
 
-      {/* Bottom Bar */}
-      <div className="mt-12 border-t border-gray-300 dark:border-gray-700 pt-6 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500 dark:text-gray-400 max-w-7xl mx-auto">
-        <p>Made with ❤️ by hamrotheme. Copyright © 2025 Hamro Theme.</p>
-        <div className="flex space-x-4 mt-4 md:mt-0">
-          <Image
-            src="/copyrightsymbol.jpg"
-            alt="Visa Electron Logo"
-            width={100}
-            height={24}
-            className="h-6 w-auto"
-          />
+      {/* Bottom */}
+      <div className="border-t border-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row items-center justify-between text-sm text-gray-500">
+          <p>&copy; {new Date().getFullYear()} HamroMart. All rights reserved.</p>
+          <p className="mt-2 md:mt-0">Made with ❤️ in Nepal</p>
         </div>
       </div>
     </footer>

@@ -13,9 +13,11 @@ export interface Product {
 
 export interface User {
   id: number;
+  name: string;
   email: string;
   password: string;
   role: "admin" | "user";
+  createdAt: string;
 }
 
 export interface CartItem {
@@ -68,4 +70,30 @@ export async function readDB(): Promise<DB> {
 
 export async function writeDB(data: DB): Promise<void> {
   await fs.writeFile(filePath, JSON.stringify(data, null, 2));
+}
+
+export function generateToken(user: { id: number; role: string; email: string; name: string }): string {
+  const payload = { id: user.id, role: user.role, email: user.email, name: user.name };
+  const base64 = Buffer.from(JSON.stringify(payload)).toString("base64");
+  const sig = Buffer.from(`${base64}-hm-secret`).toString("base64");
+  return `${base64}.${sig}`;
+}
+
+export function verifyToken(token: string): { id: number; role: string; email: string; name: string } | null {
+  try {
+    const [base64, sig] = token.split(".");
+    if (!base64 || !sig) return null;
+    const expectedSig = Buffer.from(`${base64}-hm-secret`).toString("base64");
+    if (sig !== expectedSig) return null;
+    const payload = JSON.parse(Buffer.from(base64, "base64").toString());
+    if (!payload.id || !payload.role || !payload.email) return null;
+    return payload;
+  } catch {
+    return null;
+  }
+}
+
+export function getUserIdFromToken(token: string): number | null {
+  const payload = verifyToken(token);
+  return payload?.id ?? null;
 }

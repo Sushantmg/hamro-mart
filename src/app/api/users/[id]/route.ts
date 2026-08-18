@@ -16,11 +16,12 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
-  data.users[index] = { ...data.users[index], ...body, id: userId };
+  const safeFields = Object.fromEntries(Object.entries(body).filter(([key]) => key !== "password"));
+  data.users[index] = { ...data.users[index], ...safeFields, id: userId };
   await writeDB(data);
 
   const user = data.users[index];
-  return NextResponse.json({ id: user.id, email: user.email, role: user.role });
+  return NextResponse.json({ id: user.id, name: user.name, email: user.email, role: user.role });
 }
 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {

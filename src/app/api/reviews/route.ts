@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
 
   const enriched = reviews.map((r) => {
     const user = data.users.find((u) => u.id === r.userId);
-    return { ...r, userName: user?.email || "Unknown" };
+    return { ...r, userName: user?.name || "Anonymous" };
   });
 
   return NextResponse.json(enriched);

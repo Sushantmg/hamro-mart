@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -8,6 +8,7 @@ import { UserIcon, ShoppingBagIcon, HeartIcon, ArrowRightOnRectangleIcon } from 
 
 type UserInfo = {
   id: number;
+  name: string;
   email: string;
   role: string;
 };
@@ -20,14 +21,15 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const token = Cookies.get("ecom-token");
-    if (!token || token === "admin") {
-      router.push("/login");
-      return;
-    }
+    if (!token) { router.push("/login"); return; }
 
-    const userId = parseInt(token.replace("user-", ""), 10);
+    let userId: number;
+    try {
+      const payload = JSON.parse(atob(token.split(".")[0]));
+      userId = payload.id;
+    } catch { router.push("/login"); return; }
 
-    fetch(`/api/users`)
+    fetch("/api/users")
       .then((res) => res.json())
       .then((users) => {
         const found = users.find((u: UserInfo) => u.id === userId);
@@ -50,70 +52,51 @@ export default function ProfilePage() {
 
   if (!user) {
     return (
-      <div className="flex justify-center items-center min-h-[60vh]">
-        <p className="text-xl text-gray-500 animate-pulse">Loading profile...</p>
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-6 py-10">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
-        <div className="flex items-center gap-4 mb-8">
-          <div className="bg-green-100 dark:bg-green-900 p-4 rounded-full">
-            <UserIcon className="h-10 w-10 text-green-600 dark:text-green-400" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
-              My Profile
-            </h1>
-            <p className="text-gray-500 dark:text-gray-400">{user.email}</p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 mb-8">
-          <Link
-            href="/orders"
-            className="flex items-center gap-3 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 p-4 rounded-xl transition-colors"
-          >
-            <ShoppingBagIcon className="h-8 w-8 text-blue-600" />
+    <div className="bg-gray-50 dark:bg-gray-950 min-h-screen">
+      <div className="max-w-lg mx-auto px-4 sm:px-6 py-8">
+        <div className="card p-8">
+          <div className="flex items-center gap-4 mb-8">
+            <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-2xl flex items-center justify-center">
+              <UserIcon className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
+            </div>
             <div>
-              <p className="text-2xl font-bold text-gray-800 dark:text-gray-200">{orderCount}</p>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{user.name}</h1>
+              <p className="text-gray-500 dark:text-gray-400">{user.email}</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 mb-8">
+            <Link href="/orders" className="card p-4 hover:shadow-md transition-shadow">
+              <ShoppingBagIcon className="h-6 w-6 text-emerald-600 mb-2" />
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{orderCount}</p>
               <p className="text-sm text-gray-500">Orders</p>
-            </div>
-          </Link>
-          <Link
-            href="/wishlist"
-            className="flex items-center gap-3 bg-pink-50 dark:bg-pink-900/30 hover:bg-pink-100 dark:hover:bg-pink-900/50 p-4 rounded-xl transition-colors"
-          >
-            <HeartIcon className="h-8 w-8 text-pink-600" />
-            <div>
-              <p className="text-2xl font-bold text-gray-800 dark:text-gray-200">{wishlistCount}</p>
+            </Link>
+            <Link href="/wishlist" className="card p-4 hover:shadow-md transition-shadow">
+              <HeartIcon className="h-6 w-6 text-red-500 mb-2" />
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{wishlistCount}</p>
               <p className="text-sm text-gray-500">Wishlist</p>
-            </div>
-          </Link>
-        </div>
+            </Link>
+          </div>
 
-        <div className="space-y-3">
-          <Link
-            href="/orders"
-            className="block w-full text-left px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300"
-          >
-            Order History
-          </Link>
-          <Link
-            href="/wishlist"
-            className="block w-full text-left px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300"
-          >
-            My Wishlist
-          </Link>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 w-full text-left px-4 py-3 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors text-red-600"
-          >
-            <ArrowRightOnRectangleIcon className="h-5 w-5" />
-            Logout
-          </button>
+          <div className="space-y-2">
+            <Link href="/orders" className="block px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-700 dark:text-gray-300 font-medium">
+              Order History
+            </Link>
+            <Link href="/wishlist" className="block px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-700 dark:text-gray-300 font-medium">
+              My Wishlist
+            </Link>
+            <button onClick={handleLogout} className="flex items-center gap-2 w-full text-left px-4 py-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors text-red-600 font-medium">
+              <ArrowRightOnRectangleIcon className="h-5 w-5" />
+              Sign Out
+            </button>
+          </div>
         </div>
       </div>
     </div>

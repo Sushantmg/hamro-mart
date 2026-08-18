@@ -1,28 +1,22 @@
 "use client";
 
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode,
-  useMemo,
-} from "react";
+import { createContext, useContext, useState, useEffect, ReactNode, useMemo } from "react";
 
-export type Product = {
+export type CartProduct = {
   id: number | string;
   title: string;
   price: number;
   discountedPrice?: number | null;
   quantity?: number;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any;
+  image?: string;
+  category?: string;
 };
 
 type CartContextType = {
-  cart: Product[];
-  addToCart: (product: Product) => void;
+  cart: CartProduct[];
+  addToCart: (product: CartProduct, qty?: number) => void;
   removeFromCart: (productId: number | string) => void;
+  updateQuantity: (productId: number | string, quantity: number) => void;
   clearCart: () => void;
   totalItems: number;
   totalPrice: number;
@@ -32,61 +26,54 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const useCart = (): CartContextType => {
   const context = useContext(CartContext);
-  if (!context) {
-    throw new Error("useCart must be used within a CartProvider");
-  }
+  if (!context) throw new Error("useCart must be used within a CartProvider");
   return context;
 };
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [cart, setCart] = useState<Product[]>([]);
+  const [cart, setCart] = useState<CartProduct[]>([]);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem("hamro-cart");
-    if (saved) {
-      try {
-        setCart(JSON.parse(saved));
-      } catch {
-        // ignore invalid data
-      }
-    }
+    try {
+      const saved = localStorage.getItem("hamro-cart");
+      if (saved) setCart(JSON.parse(saved));
+    } catch { /* ignore */ }
     setLoaded(true);
   }, []);
 
   useEffect(() => {
-    if (loaded) {
-      localStorage.setItem("hamro-cart", JSON.stringify(cart));
-    }
+    if (loaded) localStorage.setItem("hamro-cart", JSON.stringify(cart));
   }, [cart, loaded]);
 
-  const addToCart = (product: Product) => {
-    setCart((prevCart) => {
-      const existing = prevCart.find((item) => item.id === product.id);
+  const addToCart = (product: CartProduct, qty = 1) => {
+    setCart((prev) => {
+      const existing = prev.find((item) => item.id === product.id);
       if (existing) {
-        return prevCart.map((item) =>
+        return prev.map((item) =>
           item.id === product.id
-            ? { ...item, quantity: (item.quantity ?? 1) + 1 }
+            ? { ...item, quantity: (item.quantity ?? 1) + qty }
             : item
         );
       }
-      return [...prevCart, { ...product, quantity: 1 }];
+      return [...prev, { ...product, quantity: qty }];
     });
   };
 
   const removeFromCart = (productId: number | string) => {
-    setCart((prevCart) => {
-      const existing = prevCart.find((item) => item.id === productId);
-      if (!existing) return prevCart;
-      if ((existing.quantity ?? 1) === 1) {
-        return prevCart.filter((item) => item.id !== productId);
-      }
-      return prevCart.map((item) =>
-        item.id === productId
-          ? { ...item, quantity: (item.quantity ?? 1) - 1 }
-          : item
-      );
-    });
+    setCart((prev) => prev.filter((item) => item.id !== productId));
+  };
+
+  const updateQuantity = (productId: number | string, quantity: number) => {
+    if (quantity <= 0) {
+      removeFromCart(productId);
+      return;
+    }
+    setCart((prev) =>
+      prev.map((item) =>
+        item.id === productId ? { ...item, quantity } : item
+      )
+    );
   };
 
   const clearCart = () => {
@@ -107,9 +94,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   }, [cart]);
 
   return (
-    <CartContext.Provider
-      value={{ cart, addToCart, removeFromCart, clearCart, totalItems, totalPrice }}
-    >
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, clearCart, totalItems, totalPrice }}>
       {children}
     </CartContext.Provider>
   );

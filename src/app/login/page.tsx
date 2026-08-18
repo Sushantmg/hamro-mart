@@ -2,29 +2,28 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 export default function LoginPage() {
   const router = useRouter();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     const token = Cookies.get("ecom-token");
-    if (token) {
-      setIsLoggedIn(true);
-    }
+    if (token) setIsLoggedIn(true);
   }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!email || !password) return;
+    setLoading(true);
 
     try {
       const res = await fetch("/api/auth/login", {
@@ -36,16 +35,17 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        console.log("login form failed")
+        toast.error(data.error || "Login failed");
+        setLoading(false);
         return;
       }
 
-      // Save token in cookie
       Cookies.set("ecom-token", data.token, { expires: 7 });
-      console.log("login successfull")
-      router.push(data.token === "admin" ? "/admin" : "/");
+      toast.success("Welcome back!");
+      router.push(data.user.role === "admin" ? "/admin" : "/");
     } catch {
-      console.log("login error")
+      toast.error("Something went wrong");
+      setLoading(false);
     }
   };
 
@@ -58,45 +58,38 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col justify-center px-6 py-12 lg:px-8 bg-gradient-to-b from-green-100 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-500">
-      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <Link href="/">
-          <Image
-            alt="Your Company"
-            src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=green&shade=600"
-            width={40}
-            height={40}
-            className="mx-auto"
-          />
-        </Link>
+    <div className="min-h-[80vh] flex items-center justify-center px-4 py-12 bg-gray-50 dark:bg-gray-950">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <Link href="/" className="inline-flex items-center gap-2 mb-6">
+            <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center">
+              <span className="text-white font-bold text-xl">H</span>
+            </div>
+          </Link>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            {isLoggedIn ? "Welcome back" : "Sign in to HamroMart"}
+          </h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-2">
+            {isLoggedIn ? "You're already signed in" : "Fresh groceries waiting for you"}
+          </p>
+        </div>
 
-        <h2 className="mt-10 text-center text-3xl font-bold text-green-500 dark:text-green-300">
-          {isLoggedIn ? "You are already logged in" : "Sign in to your account"}
-        </h2>
-      </div>
-
-      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        {isLoggedIn ? (
-          <button
-            onClick={handleLogout}
-            className="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg shadow-lg transition-all duration-300"
-          >
-            Logout
-          </button>
-        ) : (
-          <form
-            onSubmit={handleLogin}
-            className="space-y-6 bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg"
-          >
-            {/* Email */}
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                Email address
-              </label>
-              <div className="mt-2">
+        <div className="card p-8">
+          {isLoggedIn ? (
+            <div className="text-center space-y-4">
+              <button onClick={handleLogout} className="btn-danger w-full">
+                Sign Out
+              </button>
+              <Link href="/" className="block text-sm text-emerald-600 hover:text-emerald-700 font-medium">
+                Go to Homepage
+              </Link>
+            </div>
+          ) : (
+            <form onSubmit={handleLogin} className="space-y-5">
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  Email address
+                </label>
                 <input
                   id="email"
                   type="email"
@@ -104,52 +97,58 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   autoComplete="email"
-                  className="block w-full rounded-md bg-white dark:bg-gray-700 px-4 py-2 text-base text-gray-900 dark:text-white focus:ring-2 focus:ring-green-600"
+                  placeholder="you@example.com"
+                  className="input-field"
                 />
               </div>
-            </div>
 
-            {/* Password */}
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                Password
-              </label>
-              <div className="mt-2">
-                <input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  autoComplete="current-password"
-                  className="block w-full rounded-md bg-white dark:bg-gray-700 px-4 py-2 text-base text-gray-900 dark:text-white focus:ring-2 focus:ring-green-600"
-                />
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  Password
+                </label>
+                <div className="relative">
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    autoComplete="current-password"
+                    placeholder="Enter your password"
+                    className="input-field !pr-11"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
+                  </button>
+                </div>
               </div>
-            </div>
 
-            {/* Submit */}
-            <div>
               <button
                 type="submit"
-                disabled={!email || !password}
-                className={`w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white py-2 rounded-lg focus:ring-2 focus:ring-green-600 transition-all duration-300 ${
-                  !email || !password ? "opacity-50 cursor-not-allowed" : ""
-                }`}
+                disabled={loading || !email || !password}
+                className="btn-primary w-full"
               >
-                Sign in
+                {loading ? "Signing in..." : "Sign In"}
               </button>
-            </div>
-          </form>
-        )}
+
+              <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3 text-xs text-gray-500 dark:text-gray-400">
+                <p className="font-medium mb-1">Demo credentials:</p>
+                <p>Admin: admin@hamromart.com / admin123</p>
+                <p>User: sus@gmail.com / 1234</p>
+              </div>
+            </form>
+          )}
+        </div>
 
         {!isLoggedIn && (
-          <p className="mt-10 text-center text-sm text-gray-500 dark:text-gray-400">
-            Not a member?{" "}
-            <Link href="/register" className="text-blue-700">
-              Start a 14-day free trial
+          <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-6">
+            Don&apos;t have an account?{" "}
+            <Link href="/register" className="text-emerald-600 hover:text-emerald-700 font-semibold">
+              Create one
             </Link>
           </p>
         )}

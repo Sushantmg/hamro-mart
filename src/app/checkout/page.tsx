@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { useCart } from "@/context/CartContext";
 import toast from "react-hot-toast";
-import { CheckCircleIcon } from "@heroicons/react/24/outline";
+import { CheckCircleIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
+import Link from "next/link";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -13,46 +14,28 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
+  const shipping = totalPrice >= 50 ? 0 : 4.99;
+  const grandTotal = totalPrice + shipping;
+
   if (cart.length === 0 && !success) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] px-6">
-        <h2 className="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-2">
-          Your cart is empty
-        </h2>
-        <p className="text-gray-500 mb-6">Add items to your cart before checking out.</p>
-        <button
-          onClick={() => router.push("/products")}
-          className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
-        >
-          Browse Products
-        </button>
+      <div className="min-h-[60vh] flex flex-col items-center justify-center px-4">
+        <h2 className="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-2">Your cart is empty</h2>
+        <p className="text-gray-500 mb-6">Add items before checking out.</p>
+        <Link href="/products" className="btn-primary">Browse Products</Link>
       </div>
     );
   }
 
   if (success) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] px-6">
-        <CheckCircleIcon className="h-20 w-20 text-green-500 mb-4" />
-        <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-2">
-          Order Placed!
-        </h2>
-        <p className="text-gray-500 mb-6">
-          Thank you for your purchase. Your order is being processed.
-        </p>
-        <div className="flex gap-4">
-          <button
-            onClick={() => router.push("/orders")}
-            className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
-          >
-            View Orders
-          </button>
-          <button
-            onClick={() => router.push("/products")}
-            className="border border-green-600 text-green-600 hover:bg-green-50 px-6 py-3 rounded-lg font-semibold transition-colors"
-          >
-            Continue Shopping
-          </button>
+      <div className="min-h-[60vh] flex flex-col items-center justify-center px-4">
+        <CheckCircleIcon className="h-20 w-20 text-emerald-500 mb-4" />
+        <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-2">Order Placed!</h2>
+        <p className="text-gray-500 mb-6">Thank you for your purchase.</p>
+        <div className="flex gap-3">
+          <Link href="/orders" className="btn-primary">View Orders</Link>
+          <Link href="/products" className="btn-secondary">Continue Shopping</Link>
         </div>
       </div>
     );
@@ -60,15 +43,23 @@ export default function CheckoutPage() {
 
   const handleCheckout = async () => {
     const token = Cookies.get("ecom-token");
-    if (!token || token === "admin") {
+    if (!token) {
       toast.error("Please login to checkout");
       router.push("/login");
       return;
     }
 
-    const userId = parseInt(token.replace("user-", ""), 10);
-    setLoading(true);
+    let userId: number;
+    try {
+      const payload = JSON.parse(atob(token.split(".")[0]));
+      userId = payload.id;
+    } catch {
+      toast.error("Invalid session. Please login again.");
+      router.push("/login");
+      return;
+    }
 
+    setLoading(true);
     try {
       const items = cart.map((item) => ({
         productId: Number(item.id),
@@ -80,7 +71,7 @@ export default function CheckoutPage() {
       const res = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, items, total: totalPrice }),
+        body: JSON.stringify({ userId, items, total: grandTotal }),
       });
 
       if (res.ok) {
@@ -98,44 +89,47 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto px-6 py-10">
-      <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-8">
-        Checkout
-      </h1>
+    <div className="bg-gray-50 dark:bg-gray-950 min-h-screen">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8">
+        <Link href="/cart" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 mb-6">
+          <ArrowLeftIcon className="h-4 w-4" />
+          Back to Cart
+        </Link>
 
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
-          Order Summary
-        </h2>
-        <div className="space-y-3">
-          {cart.map((item) => (
-            <div key={item.id} className="flex justify-between text-sm">
-              <span className="text-gray-700 dark:text-gray-300">
-                {item.title} x {item.quantity ?? 1}
-              </span>
-              <span className="font-medium text-gray-800 dark:text-gray-200">
-                ${((item.discountedPrice ?? item.price) * (item.quantity ?? 1)).toFixed(2)}
+        <h1 className="section-title mb-8">Checkout</h1>
+
+        <div className="card p-6 mb-6">
+          <h2 className="font-semibold text-gray-900 dark:text-white mb-4">Order Summary</h2>
+          <div className="space-y-3">
+            {cart.map((item) => (
+              <div key={item.id} className="flex justify-between text-sm">
+                <span className="text-gray-600 dark:text-gray-400">
+                  {item.title} &times; {item.quantity ?? 1}
+                </span>
+                <span className="font-medium text-gray-900 dark:text-white">
+                  ${((item.discountedPrice ?? item.price) * (item.quantity ?? 1)).toFixed(2)}
+                </span>
+              </div>
+            ))}
+          </div>
+          <div className="border-t mt-4 pt-4 space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-500">Shipping</span>
+              <span className={shipping === 0 ? "text-emerald-600 font-medium" : ""}>
+                {shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}
               </span>
             </div>
-          ))}
+            <div className="flex justify-between">
+              <span className="text-lg font-bold text-gray-900 dark:text-white">Total</span>
+              <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400">${grandTotal.toFixed(2)}</span>
+            </div>
+          </div>
         </div>
-        <div className="border-t mt-4 pt-4 flex justify-between">
-          <span className="text-lg font-bold text-gray-800 dark:text-gray-200">Total</span>
-          <span className="text-lg font-bold text-green-700 dark:text-green-300">
-            ${totalPrice.toFixed(2)}
-          </span>
-        </div>
-      </div>
 
-      <button
-        onClick={handleCheckout}
-        disabled={loading}
-        className={`w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold text-lg transition-colors ${
-          loading ? "opacity-50 cursor-not-allowed" : ""
-        }`}
-      >
-        {loading ? "Placing Order..." : "Place Order"}
-      </button>
+        <button onClick={handleCheckout} disabled={loading} className="btn-primary w-full">
+          {loading ? "Placing Order..." : `Place Order — $${grandTotal.toFixed(2)}`}
+        </button>
+      </div>
     </div>
   );
 }

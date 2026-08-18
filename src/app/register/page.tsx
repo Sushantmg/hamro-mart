@@ -2,31 +2,34 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
-export default function RegisterForm() {
+export default function RegisterPage() {
   const router = useRouter();
-
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!name || !email || !password) {
       toast.error("All fields are required");
       return;
     }
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return;
+    }
+    setLoading(true);
 
     try {
       const res = await fetch("/api/auth/signup", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
       });
 
@@ -34,69 +37,52 @@ export default function RegisterForm() {
 
       if (!res.ok) {
         toast.error(data.error || "Failed to register");
+        setLoading(false);
         return;
       }
 
-      toast.success("Signup successful");
+      toast.success("Account created! Please sign in.");
       router.push("/login");
     } catch {
       toast.error("Something went wrong");
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen flex-1 flex-col justify-center px-6 py-12 lg:px-8 bg-gradient-to-b from-green-100 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-500">
-      
-      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <Link href="/">
-          <Image
-            alt="Your Company"
-            src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=green&shade=600"
-            width={40}
-            height={40}
-            className="mx-auto"
-          />
-        </Link>
+    <div className="min-h-[80vh] flex items-center justify-center px-4 py-12 bg-gray-50 dark:bg-gray-950">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <Link href="/" className="inline-flex items-center gap-2 mb-6">
+            <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center">
+              <span className="text-white font-bold text-xl">H</span>
+            </div>
+          </Link>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Create your account</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-2">Start shopping fresh today</p>
+        </div>
 
-        <h2 className="mt-10 text-center text-3xl font-bold text-green-600 dark:text-green-300">
-          Create your account
-        </h2>
-      </div>
-
-      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form
-          onSubmit={handleRegister}
-          className="space-y-6 bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg"
-        >
-          {/* NAME */}
-          <div>
-            <label
-              htmlFor="name"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              Full Name
-            </label>
-            <div className="mt-2">
+        <div className="card p-8">
+          <form onSubmit={handleRegister} className="space-y-5">
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                Full Name
+              </label>
               <input
                 id="name"
                 type="text"
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="block w-full rounded-md bg-white dark:bg-gray-700 px-4 py-2 text-base text-gray-900 dark:text-white focus:ring-2 focus:ring-green-600"
+                placeholder="John Doe"
+                className="input-field"
               />
             </div>
-          </div>
 
-          {/* EMAIL */}
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              Email address
-            </label>
-            <div className="mt-2">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                Email address
+              </label>
               <input
                 id="email"
                 type="email"
@@ -104,51 +90,45 @@ export default function RegisterForm() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 autoComplete="email"
-                className="block w-full rounded-md bg-white dark:bg-gray-700 px-4 py-2 text-base text-gray-900 dark:text-white focus:ring-2 focus:ring-green-600"
+                placeholder="you@example.com"
+                className="input-field"
               />
             </div>
-          </div>
 
-          {/* PASSWORD */}
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              Password
-            </label>
-            <div className="mt-2">
-              <input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="new-password"
-                className="block w-full rounded-md bg-white dark:bg-gray-700 px-4 py-2 text-base text-gray-900 dark:text-white focus:ring-2 focus:ring-green-600"
-              />
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="new-password"
+                  placeholder="Min 6 characters"
+                  className="input-field !pr-11"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showPassword ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
+                </button>
+              </div>
             </div>
-          </div>
 
-          {/* Button */}
-          <div>
-            <button
-              type="submit"
-              disabled={!name || !email || !password}
-              className={`w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white py-2 rounded-lg transition-all duration-300 focus:ring-2 focus:ring-green-600 ${
-                !name || !email || !password
-                  ? "opacity-50 cursor-not-allowed"
-                  : ""
-              }`}
-            >
-              Register
+            <button type="submit" disabled={loading || !name || !email || !password} className="btn-primary w-full">
+              {loading ? "Creating account..." : "Create Account"}
             </button>
-          </div>
-        </form>
+          </form>
+        </div>
 
-        <p className="mt-10 text-center text-sm text-gray-500 dark:text-gray-400">
+        <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-6">
           Already have an account?{" "}
-          <Link href="/login" className="text-blue-700">
+          <Link href="/login" className="text-emerald-600 hover:text-emerald-700 font-semibold">
             Sign in
           </Link>
         </p>

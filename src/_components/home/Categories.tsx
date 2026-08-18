@@ -1,62 +1,45 @@
 "use client";
 
-import React from "react";
-import {
-  GiMeat,
-  GiMilkCarton,
-  GiShoppingCart,
-  GiFruitBowl,
-  GiCarrot,
-} from "react-icons/gi";
-import { FaEgg } from "react-icons/fa";
+import Link from "next/link";
+import { GiCarrot, GiFruitBowl } from "react-icons/gi";
+import { MdLocalGroceryStore } from "react-icons/md";
+import { FaEgg, FaCheese } from "react-icons/fa";
 
-// Define the type for each category
-type Category = {
-  icon: React.ElementType;
-  label: string;
-};
-
-// Array of category data
-const categories: Category[] = [
-  { icon: GiCarrot, label: "Vegetables" },
-  { icon: GiFruitBowl, label: "Fruits" },
-  { icon: GiShoppingCart, label: "Shopping" },
-  { icon: GiMilkCarton, label: "Milks" },
-  { icon: FaEgg, label: "Eggs" },
-  { icon: GiMeat, label: "Meats" },
+const categories = [
+  { icon: GiCarrot, label: "Vegetables", href: "/products?category=vegetables", color: "from-orange-400 to-orange-600" },
+  { icon: GiFruitBowl, label: "Fruits", href: "/products?category=fruits", color: "from-red-400 to-red-600" },
+  { icon: MdLocalGroceryStore, label: "All Products", href: "/products", color: "from-emerald-400 to-emerald-600" },
+  { icon: FaCheese, label: "Dairy", href: "/products", color: "from-yellow-400 to-yellow-600" },
+  { icon: FaEgg, label: "Eggs", href: "/products", color: "from-amber-400 to-amber-600" },
 ];
 
-const Categories: React.FC = () => {
+export default function Categories() {
   return (
-    <div className="text-center py-10 dark:bg-gray-900">
-      <h2 className="text-2xl font-bold dark:text-white">
-        Discover our{" "}
-        <span className="text-green-500 underline decoration-green-300 decoration-4">
-          Categories
-        </span>
-      </h2>
+    <section className="py-16 bg-white dark:bg-gray-950">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-10">
+          <h2 className="section-title">Shop by <span className="text-emerald-600">Category</span></h2>
+          <p className="mt-2 text-gray-500 dark:text-gray-400">Browse our wide selection of fresh produce</p>
+        </div>
 
-      <div className="mt-10 flex flex-wrap justify-center gap-6">
-        {categories.map((cat, index) => {
-          const Icon = cat.icon;
-          return (
-            <div
-              key={index}
-              className="w-40 h-40 border border-gray-200 dark:border-gray-700 dark:hover:shadow-gray-700 rounded-2xl flex flex-col items-center justify-center hover:shadow-lg transition duration-300 group bg-white dark:bg-gradient-to-br dark:from-gray-800 dark:to-gray-900"
-            >
-              <Icon
-                size={40}
-                className="text-green-500 mb-2 transform transition-transform duration-500 group-hover:rotate-[360deg] group-hover:scale-110"
-              />
-              <p className="text-sm font-semibold text-center px-2 text-gray-700 dark:text-gray-200">
-                {cat.label}
-              </p>
-            </div>
-          );
-        })}
+        <div className="flex flex-wrap justify-center gap-6">
+          {categories.map((cat) => {
+            const Icon = cat.icon;
+            return (
+              <Link
+                key={cat.label}
+                href={cat.href}
+                className="group w-36 h-36 bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl flex flex-col items-center justify-center gap-3 hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+              >
+                <div className={`w-14 h-14 bg-gradient-to-br ${cat.color} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-md`}>
+                  <Icon size={28} className="text-white" />
+                </div>
+                <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{cat.label}</span>
+              </Link>
+            );
+          })}
+        </div>
       </div>
-    </div>
+    </section>
   );
-};
-
-export default Categories;
+}

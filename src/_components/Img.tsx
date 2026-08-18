@@ -1,48 +1,32 @@
 "use client";
 
 import Image from "next/image";
-import React from "react";
 
-const Img = () => {
+export default function Img() {
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-green-100 to-green-200 dark:from-gray-900 dark:to-gray-900 px-4 transition-colors duration-500">
-      <div className="backdrop-blur-xl bg-white/20 dark:bg-white/10 border border-white/30 dark:border-white/20 rounded-3xl shadow-2xl p-10 w-full max-w-7xl text-center">
-        <h1 className="text-4xl font-extrabold text-green-500 drop-shadow mb-8 dark:text-green-300">
-          Download our App!
-        </h1>
+    <section className="py-16 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-gray-900 dark:to-gray-950">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 className="section-title mb-2">Download our <span className="text-emerald-600">App</span></h2>
+        <p className="text-gray-500 dark:text-gray-400 mb-10">Shop on the go with our mobile app</p>
 
-        {/* App preview image */}
-        <div className="relative w-full max-w-6xl mx-auto mb-10 aspect-[16/9]">
+        <div className="relative w-full max-w-4xl mx-auto aspect-[16/9] rounded-2xl overflow-hidden shadow-2xl mb-8">
           <Image
             src="/webimg.webp"
-            alt="App Preview"
+            alt="HamroMart App Preview"
             fill
-            className="object-cover rounded-2xl shadow-xl border border-white/20 dark:border-white/10"
+            className="object-cover"
           />
         </div>
 
-        {/* Download buttons */}
-        <div className="flex justify-center gap-6 flex-wrap">
-          <div className="relative w-44 h-14">
-            <Image
-              src="/googleplay.webp"
-              alt="Get it on Google Play"
-              fill
-              className="object-contain hover:scale-110 hover:rotate-1 transition-transform duration-300 shadow-lg rounded-lg"
-            />
+        <div className="flex justify-center gap-4">
+          <div className="relative w-40 h-12">
+            <Image src="/googleplay.webp" alt="Get it on Google Play" fill className="object-contain" />
           </div>
-          <div className="relative w-44 h-14">
-            <Image
-              src="/appstore.webp"
-              alt="Download on the App Store"
-              fill
-              className="object-contain hover:scale-110 hover:-rotate-1 transition-transform duration-300 shadow-lg rounded-lg"
-            />
+          <div className="relative w-40 h-12">
+            <Image src="/appstore.webp" alt="Download on the App Store" fill className="object-contain" />
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
-};
-
-export default Img;
+}

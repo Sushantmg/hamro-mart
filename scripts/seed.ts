@@ -1,0 +1,59 @@
+import bcrypt from "bcryptjs";
+
+const users = [
+  { id: 0, name: "Admin", email: "admin@hamromart.com", password: "admin123", role: "admin" as const, createdAt: "2025-01-01T00:00:00.000Z" },
+  { id: 1, name: "Sushant", email: "sus@gmail.com", password: "1234", role: "user" as const, createdAt: "2025-01-02T00:00:00.000Z" },
+  { id: 2, name: "Test User", email: "testuser1@example.com", password: "pass123", role: "user" as const, createdAt: "2025-01-03T00:00:00.000Z" },
+  { id: 3, name: "Alice Johnson", email: "alice@example.com", password: "alice123", role: "user" as const, createdAt: "2025-01-04T00:00:00.000Z" },
+  { id: 4, name: "Bob Smith", email: "bob@example.com", password: "bobsecure", role: "user" as const, createdAt: "2025-01-05T00:00:00.000Z" },
+  { id: 5, name: "Charlie Brown", email: "charlie@example.com", password: "charlie456", role: "user" as const, createdAt: "2025-01-06T00:00:00.000Z" },
+  { id: 6, name: "Diana Prince", email: "diana@example.com", password: "diana789", role: "user" as const, createdAt: "2025-01-07T00:00:00.000Z" },
+];
+
+const products = [
+  { id: 1, name: "Apple", category: "fruits", image: "https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?auto=format&fit=crop&w=400&q=80", desc: "Crisp and juicy fresh apples, perfect for snacking or baking.", price: 2.99, discount: 10 },
+  { id: 2, name: "Banana", category: "fruits", image: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=400&q=80", desc: "Sweet and ripe bananas, rich in potassium.", price: 1.29, discount: 0 },
+  { id: 3, name: "Carrot", category: "vegetables", image: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?auto=format&fit=crop&w=400&q=80", desc: "Crunchy organic carrots, rich in Vitamin A and beta-carotene.", price: 1.49, discount: 20 },
+  { id: 4, name: "Broccoli", category: "vegetables", image: "https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?auto=format&fit=crop&w=400&q=80", desc: "Fresh green broccoli florets, packed with nutrients.", price: 2.49, discount: 0 },
+  { id: 5, name: "Tomato", category: "vegetables", image: "https://images.unsplash.com/photo-1546470427-0d4db154ceb8?auto=format&fit=crop&w=400&q=80", desc: "Juicy organic tomatoes, vine-ripened for maximum flavor.", price: 1.99, discount: 10 },
+  { id: 6, name: "Strawberry", category: "fruits", image: "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?auto=format&fit=crop&w=400&q=80", desc: "Sweet red strawberries, freshly picked and hand-selected.", price: 3.99, discount: 20 },
+  { id: 7, name: "Pineapple", category: "fruits", image: "https://images.unsplash.com/photo-1550258987-190a2d41a8ba?auto=format&fit=crop&w=400&q=80", desc: "Tangy tropical pineapple, perfect for smoothies and desserts.", price: 2.49, discount: 0 },
+  { id: 8, name: "Spinach", category: "vegetables", image: "https://images.unsplash.com/photo-1576045057995-568f588f82fb?auto=format&fit=crop&w=400&q=80", desc: "Fresh leafy spinach, great for salads and smoothies.", price: 1.99, discount: 10 },
+  { id: 9, name: "Orange", category: "fruits", image: "https://images.unsplash.com/photo-1547514701-42782101795e?auto=format&fit=crop&w=400&q=80", desc: "Juicy navel oranges, bursting with Vitamin C.", price: 1.79, discount: 5 },
+  { id: 10, name: "Mango", category: "fruits", image: "https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&w=400&q=80", desc: "Ripe Alphonso mangoes, sweet and fragrant.", price: 3.49, discount: 15 },
+  { id: 11, name: "Lettuce", category: "vegetables", image: "https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?auto=format&fit=crop&w=400&q=80", desc: "Crisp iceberg lettuce, perfect for salads and wraps.", price: 1.29, discount: 0 },
+  { id: 12, name: "Bell Pepper", category: "vegetables", image: "https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?auto=format&fit=crop&w=400&q=80", desc: "Colorful bell peppers, sweet and crunchy.", price: 2.29, discount: 10 },
+  { id: 13, name: "Grapes", category: "fruits", image: "https://images.unsplash.com/photo-1537640538966-79f369143f8f?auto=format&fit=crop&w=400&q=80", desc: "Seedless green grapes, sweet and refreshing.", price: 3.99, discount: 0 },
+  { id: 14, name: "Potato", category: "vegetables", image: "https://images.unsplash.com/photo-1518977676601-b53f82ber20d?auto=format&fit=crop&w=400&q=80", desc: "Premium baking potatoes, fluffy and versatile.", price: 0.99, discount: 0 },
+  { id: 15, name: "Blueberry", category: "fruits", image: "https://images.unsplash.com/photo-1498557850523-fd3d1186bcff?auto=format&fit=crop&w=400&q=80", desc: "Organic blueberries, packed with antioxidants.", price: 4.99, discount: 10 },
+  { id: 16, name: "Onion", category: "vegetables", image: "https://images.unsplash.com/photo-1618512496248-a09fe1f0e047?auto=format&fit=crop&w=400&q=80", desc: "Fresh yellow onions, essential for every kitchen.", price: 0.89, discount: 0 },
+];
+
+async function seed() {
+  console.log("Hashing passwords...");
+  const hashedUsers = await Promise.all(
+    users.map(async (user) => ({
+      ...user,
+      password: await bcrypt.hash(user.password, 10),
+    }))
+  );
+
+  const db = {
+    products,
+    users: hashedUsers,
+    wishlist: [],
+    orders: [],
+    reviews: [],
+    cart: [],
+  };
+
+  const fs = await import("fs/promises");
+  const path = await import("path");
+  const filePath = path.join(process.cwd(), "data", "db.json");
+  await fs.writeFile(filePath, JSON.stringify(db, null, 2));
+  console.log("Database seeded successfully!");
+  console.log("Admin: admin@hamromart.com / admin123");
+  console.log("User: sus@gmail.com / 1234");
+}
+
+seed();

@@ -1,131 +1,89 @@
 "use client";
 
-import React, { useEffect, useState, ReactNode } from "react";
+import { useEffect, useState, ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
-import toast from "react-hot-toast";
+import { ShoppingCartIcon, UserGroupIcon, TagIcon, CubeIcon, CurrencyDollarIcon } from "@heroicons/react/24/outline";
 
-import {
-  ShoppingCartIcon,
-  UserGroupIcon,
-  TagIcon,
-  CubeIcon,
-} from "@heroicons/react/24/outline";
+type Product = { id: number; name: string; price: number; discount: number; category: string };
+type User = { id: number; name: string; email: string; role: string };
 
-type Product = {
-  id: number;
-  name: string;
-  price: number;
-  discount: number;
-  category: string;
-};
-
-type User = {
-  id: number;
-  email: string;
-  password: string;
-};
-
-type StatCardProps = {
-  title: string;
-  value: number;
-  icon: ReactNode;
-  gradient: string;
-};
-
-export default function Dashboard() {
-  const router = useRouter();
-
-  const [products, setProducts] = useState<Product[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const token = Cookies.get("ecom-token");
-
-    if (token !== "admin") {
-      toast.error("Access denied. Admins only.");
-      router.push("/login");
-      return;
-    }
-
-    async function fetchData() {
-      try {
-        const productRes = await fetch("/api/products");
-        const userRes = await fetch("/api/users");
-        const productsData = await productRes.json();
-        const usersData = await userRes.json();
-
-        setProducts(productsData);
-        setUsers(usersData);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setLoading(false);
-      }
-    }
-
-    fetchData();
-  }, [router]);
-
-  const discountedProducts = products.filter((p) => p.discount > 0);
-  const categories = [...new Set(products.map((p) => p.category))];
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="text-2xl font-semibold text-gray-600 animate-pulse">
-          Loading Dashboard...
-        </div>
-      </div>
-    );
-  }
-
+function StatCard({ title, value, icon, color }: { title: string; value: number | string; icon: ReactNode; color: string }) {
   return (
-    <div className="px-6 py-10 min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-100">
-      <h1 className="text-4xl font-bold text-gray-800 mb-8">📊 Admin Dashboard</h1>
-
-      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          title="Total Products"
-          value={products.length}
-          icon={<ShoppingCartIcon className="h-8 w-8 text-blue-600" />}
-          gradient="from-blue-100 to-blue-300"
-        />
-        <StatCard
-          title="Total Users"
-          value={users.length}
-          icon={<UserGroupIcon className="h-8 w-8 text-green-600" />}
-          gradient="from-green-100 to-green-300"
-        />
-        <StatCard
-          title="Discounted Products"
-          value={discountedProducts.length}
-          icon={<TagIcon className="h-8 w-8 text-yellow-600" />}
-          gradient="from-yellow-100 to-yellow-300"
-        />
-        <StatCard
-          title="Product Categories"
-          value={categories.length}
-          icon={<CubeIcon className="h-8 w-8 text-purple-600" />}
-          gradient="from-purple-100 to-purple-300"
-        />
+    <div className="card p-5">
+      <div className="flex items-center gap-4">
+        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${color}`}>
+          {icon}
+        </div>
+        <div>
+          <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">{title}</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-white">{value}</p>
+        </div>
       </div>
     </div>
   );
 }
 
-function StatCard({ title, value, icon, gradient }: StatCardProps) {
+export default function Dashboard() {
+  const router = useRouter();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const token = Cookies.get("ecom-token");
+    let isAdmin = false;
+    if (token) {
+      try {
+        if (token === "admin") { isAdmin = true; }
+        else { const p = JSON.parse(atob(token.split(".")[0])); isAdmin = p.role === "admin"; }
+      } catch { /* not admin */ }
+    }
+    if (!isAdmin) { router.push("/login"); return; }
+
+    Promise.all([
+      fetch("/api/products").then((r) => r.json()),
+      fetch("/api/users").then((r) => r.json()),
+      fetch("/api/orders").then((r) => r.json()),
+    ]).then(([p, u, o]) => {
+      setProducts(p);
+      setUsers(u);
+      setOrders(o);
+      setLoading(false);
+    });
+  }, [router]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="w-8 h-8 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  const discountedCount = products.filter((p) => p.discount > 0).length;
+  const categories = [...new Set(products.map((p) => p.category))].length;
+  const totalRevenue = orders.reduce((sum: number, o: { total: number }) => sum + o.total, 0);
+
   return (
-    <div
-      className={`bg-gradient-to-br ${gradient} backdrop-blur-md rounded-2xl p-6 shadow-xl transform hover:scale-105 transition-all duration-300`}
-    >
-      <div className="flex items-center space-x-4">
-        <div className="p-3 bg-white rounded-full shadow-md">{icon}</div>
-        <div>
-          <p className="text-sm text-gray-600 font-semibold uppercase">{title}</p>
-          <p className="text-3xl font-extrabold text-gray-800">{value}</p>
-        </div>
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+        <p className="text-gray-500 dark:text-gray-400 mt-1">Welcome back, Admin</p>
+      </div>
+
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard title="Total Products" value={products.length} icon={<ShoppingCartIcon className="h-6 w-6 text-blue-600" />} color="bg-blue-100 dark:bg-blue-900/30" />
+        <StatCard title="Total Users" value={users.length} icon={<UserGroupIcon className="h-6 w-6 text-emerald-600" />} color="bg-emerald-100 dark:bg-emerald-900/30" />
+        <StatCard title="Total Orders" value={orders.length} icon={<CubeIcon className="h-6 w-6 text-purple-600" />} color="bg-purple-100 dark:bg-purple-900/30" />
+        <StatCard title="Revenue" value={`$${totalRevenue.toFixed(2)}`} icon={<CurrencyDollarIcon className="h-6 w-6 text-amber-600" />} color="bg-amber-100 dark:bg-amber-900/30" />
+      </div>
+
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
+        <StatCard title="Categories" value={categories} icon={<TagIcon className="h-6 w-6 text-pink-600" />} color="bg-pink-100 dark:bg-pink-900/30" />
+        <StatCard title="On Sale" value={discountedCount} icon={<TagIcon className="h-6 w-6 text-green-600" />} color="bg-green-100 dark:bg-green-900/30" />
+        <StatCard title="Avg Order" value={orders.length > 0 ? `$${(totalRevenue / orders.length).toFixed(2)}` : "$0"} icon={<CurrencyDollarIcon className="h-6 w-6 text-indigo-600" />} color="bg-indigo-100 dark:bg-indigo-900/30" />
       </div>
     </div>
   );
