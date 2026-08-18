@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import Cookies from "js-cookie";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
@@ -10,6 +11,7 @@ import toast from "react-hot-toast";
 import { HeartIcon } from "@heroicons/react/24/outline";
 import { HeartIcon as HeartSolidIcon } from "@heroicons/react/24/solid";
 import { StarIcon } from "@heroicons/react/24/solid";
+import { MinusIcon, PlusIcon } from "@heroicons/react/24/outline";
 
 interface Product {
   id: number;
@@ -45,9 +47,11 @@ interface Review {
 export default function ProductDetailsPage() {
   const { id } = useParams();
   const [product, setProduct] = useState<Product | null>(null);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
+  const [quantity, setQuantity] = useState(1);
   const [loadingReviews, setLoadingReviews] = useState(true);
   const { addToCart } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
@@ -73,6 +77,31 @@ export default function ProductDetailsPage() {
           discount: item.discount,
           discountedPrice,
         });
+
+        fetch("/api/products")
+          .then((res) => res.json())
+          .then((all: RawProduct[]) => {
+            const related = all
+              .filter((p) => p.category === item.category && p.id !== item.id)
+              .slice(0, 4)
+              .map((p) => {
+                const price = typeof p.price === "string" ? parseFloat(p.price) : p.price;
+                const disc = p.discount
+                  ? parseFloat(((price * (100 - p.discount)) / 100).toFixed(2))
+                  : null;
+                return {
+                  id: p.id,
+                  title: `Fresh ${p.name}`,
+                  category: p.category,
+                  image: p.image,
+                  description: p.desc,
+                  price,
+                  discount: p.discount,
+                  discountedPrice: disc,
+                };
+              });
+            setRelatedProducts(related);
+          });
       })
       .catch((err) => {
         console.error("Error fetching product:", err);
@@ -90,6 +119,7 @@ export default function ProductDetailsPage() {
 
   useEffect(() => {
     fetchReviews();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const handleReviewSubmit = async (e: React.FormEvent) => {
@@ -126,8 +156,16 @@ export default function ProductDetailsPage() {
 
   if (!product) {
     return (
-      <div className="flex justify-center items-center min-h-[60vh]">
-        <p className="text-xl text-gray-500 animate-pulse">Loading product...</p>
+      <div className="max-w-4xl mx-auto mt-20 p-6">
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="bg-gray-200 dark:bg-gray-700 rounded-lg h-80 animate-pulse" />
+          <div className="space-y-4">
+            <div className="bg-gray-200 dark:bg-gray-700 rounded h-8 w-3/4 animate-pulse" />
+            <div className="bg-gray-200 dark:bg-gray-700 rounded h-4 w-1/2 animate-pulse" />
+            <div className="bg-gray-200 dark:bg-gray-700 rounded h-4 w-full animate-pulse" />
+            <div className="bg-gray-200 dark:bg-gray-700 rounded h-6 w-1/3 animate-pulse" />
+          </div>
+        </div>
       </div>
     );
   }
@@ -142,7 +180,7 @@ export default function ProductDetailsPage() {
             fill
             style={{ objectFit: "cover" }}
             sizes="(max-width: 768px) 100vw, 50vw"
-            priority={false}
+            priority
           />
         </div>
         <div className="space-y-4">
@@ -199,14 +237,38 @@ export default function ProductDetailsPage() {
             </div>
           )}
 
+          {/* Quantity Selector */}
+          <div className="flex items-center gap-4">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Quantity:</span>
+            <div className="flex items-center border rounded-lg overflow-hidden">
+              <button
+                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                className="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                <MinusIcon className="h-4 w-4" />
+              </button>
+              <span className="px-4 py-2 font-semibold text-gray-800 dark:text-gray-200 min-w-[40px] text-center">
+                {quantity}
+              </span>
+              <button
+                onClick={() => setQuantity(quantity + 1)}
+                className="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                <PlusIcon className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+
           <button
             onClick={() => {
-              addToCart(product);
-              toast.success(`${product.title} added to cart!`);
+              for (let i = 0; i < quantity; i++) {
+                addToCart(product);
+              }
+              toast.success(`${quantity}x ${product.title} added to cart!`);
             }}
-            className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-semibold transition"
+            className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition w-full text-lg"
           >
-            Add to Cart
+            Add to Cart — ${((product.discountedPrice ?? product.price) * quantity).toFixed(2)}
           </button>
         </div>
       </div>
@@ -217,19 +279,13 @@ export default function ProductDetailsPage() {
           Customer Reviews ({reviews.length})
         </h2>
 
-        {/* Review Form */}
         <form onSubmit={handleReviewSubmit} className="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 mb-8">
           <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-4">Write a Review</h3>
           <div className="mb-4">
             <label className="block text-sm text-gray-600 dark:text-gray-400 mb-2">Rating</label>
             <div className="flex gap-1">
               {[1, 2, 3, 4, 5].map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  onClick={() => setRating(s)}
-                  className="focus:outline-none"
-                >
+                <button key={s} type="button" onClick={() => setRating(s)} className="focus:outline-none">
                   <StarIcon
                     className={`h-7 w-7 transition-colors ${s <= rating ? "text-yellow-400" : "text-gray-300 hover:text-yellow-200"}`}
                   />
@@ -255,9 +311,15 @@ export default function ProductDetailsPage() {
           </button>
         </form>
 
-        {/* Reviews List */}
         {loadingReviews ? (
-          <p className="text-gray-500 animate-pulse">Loading reviews...</p>
+          <div className="space-y-3">
+            {[1, 2].map((n) => (
+              <div key={n} className="bg-gray-100 dark:bg-gray-800 rounded-xl p-5 animate-pulse">
+                <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-1/3 mb-3" />
+                <div className="h-3 bg-gray-300 dark:bg-gray-600 rounded w-2/3" />
+              </div>
+            ))}
+          </div>
         ) : reviews.length === 0 ? (
           <p className="text-gray-500 text-center py-8">No reviews yet. Be the first to review!</p>
         ) : (
@@ -290,6 +352,34 @@ export default function ProductDetailsPage() {
           </div>
         )}
       </div>
+
+      {/* Related Products */}
+      {relatedProducts.length > 0 && (
+        <div className="mt-12 border-t pt-8">
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6">
+            Related Products
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {relatedProducts.map((p) => (
+              <Link
+                key={p.id}
+                href={`/products/${p.id}`}
+                className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3 hover:scale-105 transition-all duration-150"
+              >
+                <div className="relative w-full h-28 rounded overflow-hidden mb-2">
+                  <Image src={p.image} alt={p.title} fill sizes="25vw" style={{ objectFit: "cover" }} />
+                </div>
+                <h4 className="text-sm font-bold text-green-700 dark:text-green-300 text-center truncate">
+                  {p.title}
+                </h4>
+                <p className="text-center text-sm font-semibold text-gray-800 dark:text-gray-200">
+                  ${(p.discountedPrice ?? p.price).toFixed(2)}
+                </p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
