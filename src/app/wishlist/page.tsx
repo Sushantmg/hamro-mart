@@ -21,10 +21,13 @@ export default function WishlistPage() {
 
   if (wishlist.length === 0) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center px-4">
-        <HeartIcon className="h-20 w-20 text-gray-300 dark:text-gray-600 mb-4" />
-        <h2 className="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-2">Your wishlist is empty</h2>
-        <p className="text-gray-500 mb-6">Save items you love for later.</p>
+      <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="w-24 h-24 rounded-2xl bg-red-50 dark:bg-red-950/30 flex items-center justify-center mb-6">
+          <HeartIcon className="h-12 w-12 text-red-400" />
+        </div>
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">Your wishlist is empty</h2>
+        <p className="text-gray-500 dark:text-gray-400 mb-2">Save items you love for later.</p>
+        <p className="text-sm text-gray-400 dark:text-gray-500 mb-8">Tap the heart icon on any product to save it here.</p>
         <Link href="/products" className="btn-primary">Browse Products</Link>
       </div>
     );

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
@@ -14,8 +14,35 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "HamroMart — Fresh Groceries Delivered",
+  title: {
+    default: "HamroMart — Fresh Groceries Delivered",
+    template: "%s | HamroMart",
+  },
   description: "Fresh fruits, vegetables, and organic produce delivered to your doorstep. Shop local, eat fresh.",
+  keywords: ["groceries", "fresh produce", "fruits", "vegetables", "organic", "delivery", "hamromart"],
+  authors: [{ name: "HamroMart" }],
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    siteName: "HamroMart",
+    title: "HamroMart — Fresh Groceries Delivered",
+    description: "Fresh fruits, vegetables, and organic produce delivered to your doorstep.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "HamroMart — Fresh Groceries Delivered",
+    description: "Fresh fruits, vegetables, and organic produce delivered to your doorstep.",
+  },
+  robots: { index: true, follow: true },
+  icons: {
+    icon: "/icon.svg",
+    apple: "/icon.svg",
+  },
+  manifest: "/manifest.json",
+};
+
+export const viewport: Viewport = {
+  themeColor: "#059669",
 };
 
 export default function RootLayout({
@@ -49,12 +76,20 @@ export default function RootLayout({
               </div>
               <Toaster
                 position="top-right"
+                gutter={12}
                 toastOptions={{
-                  duration: 3000,
+                  duration: 3500,
                   style: {
                     borderRadius: '12px',
                     padding: '12px 16px',
                     fontSize: '14px',
+                    boxShadow: '0 10px 40px rgba(0,0,0,0.12)',
+                  },
+                  success: {
+                    iconTheme: { primary: '#059669', secondary: '#fff' },
+                  },
+                  error: {
+                    iconTheme: { primary: '#dc2626', secondary: '#fff' },
                   },
                 }}
               />

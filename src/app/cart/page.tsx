@@ -28,10 +28,13 @@ export default function Cart() {
         </div>
 
         {cart.length === 0 ? (
-          <div className="card p-16 text-center">
-            <ShoppingBagIcon className="h-20 w-20 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-2">Your cart is empty</h2>
-            <p className="text-gray-500 dark:text-gray-400 mb-6">Add some fresh produce to get started!</p>
+          <div className="card p-16 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="w-24 h-24 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center mx-auto mb-6">
+              <ShoppingBagIcon className="h-12 w-12 text-emerald-500" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">Your cart is empty</h2>
+            <p className="text-gray-500 dark:text-gray-400 mb-2">Looks like you haven&apos;t added anything yet.</p>
+            <p className="text-sm text-gray-400 dark:text-gray-500 mb-8">Browse our fresh products and add your favorites!</p>
             <Link href="/products" className="btn-primary inline-flex">
               Browse Products
             </Link>

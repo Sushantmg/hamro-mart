@@ -19,9 +19,13 @@ export default function CheckoutPage() {
 
   if (cart.length === 0 && !success) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center px-4">
-        <h2 className="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-2">Your cart is empty</h2>
-        <p className="text-gray-500 mb-6">Add items before checking out.</p>
+      <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="w-24 h-24 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-6">
+          <ArrowLeftIcon className="h-10 w-10 text-gray-400" />
+        </div>
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">Your cart is empty</h2>
+        <p className="text-gray-500 mb-2">Add items before checking out.</p>
+        <p className="text-sm text-gray-400 dark:text-gray-500 mb-8">Your cart is waiting to be filled with fresh produce!</p>
         <Link href="/products" className="btn-primary">Browse Products</Link>
       </div>
     );
@@ -29,12 +33,18 @@ export default function CheckoutPage() {
 
   if (success) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center px-4">
-        <CheckCircleIcon className="h-20 w-20 text-emerald-500 mb-4" />
-        <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-2">Order Placed!</h2>
-        <p className="text-gray-500 mb-6">Thank you for your purchase.</p>
+      <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 animate-in fade-in zoom-in-95 duration-500">
+        <div className="relative mb-6">
+          <div className="absolute inset-0 bg-emerald-200 dark:bg-emerald-800 rounded-full blur-xl opacity-40 animate-pulse" />
+          <div className="relative w-24 h-24 rounded-full bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center">
+            <CheckCircleIcon className="h-14 w-14 text-emerald-500" />
+          </div>
+        </div>
+        <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-2">Order Confirmed!</h2>
+        <p className="text-gray-500 dark:text-gray-400 mb-2">Thank you for your purchase.</p>
+        <p className="text-sm text-gray-400 dark:text-gray-500 mb-8">We&apos;ll send you a confirmation email shortly.</p>
         <div className="flex gap-3">
-          <Link href="/orders" className="btn-primary">View Orders</Link>
+          <Link href="/orders" className="btn-primary">View My Orders</Link>
           <Link href="/products" className="btn-secondary">Continue Shopping</Link>
         </div>
       </div>
