@@ -8,7 +8,7 @@ import Cookies from "js-cookie";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import toast from "react-hot-toast";
-import { HeartIcon, MinusIcon, PlusIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
+import { HeartIcon, MinusIcon, PlusIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { HeartIcon as HeartSolidIcon } from "@heroicons/react/24/solid";
 import { StarIcon as StarSolidIcon } from "@heroicons/react/24/solid";
 
@@ -52,6 +52,7 @@ export default function ProductDetailsPage() {
   const [comment, setComment] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [loadingReviews, setLoadingReviews] = useState(true);
+  const [imgZoomed, setImgZoomed] = useState(false);
   const { addToCart } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
 
@@ -153,20 +154,28 @@ export default function ProductDetailsPage() {
   return (
     <div className="bg-gray-50 dark:bg-gray-950 min-h-screen">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
-        <Link href="/products" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 mb-6">
-          <ArrowLeftIcon className="h-4 w-4" />
-          Back to Products
-        </Link>
+        <nav className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 mb-6">
+          <Link href="/" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Home</Link>
+          <span className="text-gray-300 dark:text-gray-600">/</span>
+          <Link href="/products" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Products</Link>
+          <span className="text-gray-300 dark:text-gray-600">/</span>
+          <Link href={`/products?category=${product.category}`} className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors capitalize">{product.category}</Link>
+          <span className="text-gray-300 dark:text-gray-600">/</span>
+          <span className="text-gray-900 dark:text-gray-200 font-medium">{product.title}</span>
+        </nav>
 
         <div className="card p-6 md:p-8">
           <div className="grid md:grid-cols-2 gap-8 items-start">
-            <div className="relative w-full aspect-square rounded-2xl overflow-hidden">
-              <Image src={product.image} alt={product.title} fill className="object-cover" priority />
+            <div className="relative w-full aspect-square rounded-2xl overflow-hidden group cursor-zoom-in" onClick={() => setImgZoomed(true)}>
+              <Image src={product.image} alt={product.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" priority />
               {product.discount > 0 && (
                 <span className="absolute top-4 left-4 bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full">
                   -{product.discount}%
                 </span>
               )}
+              <div className="absolute top-4 right-4 w-8 h-8 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <MagnifyingGlassIcon className="h-4 w-4 text-white" />
+              </div>
             </div>
 
             <div className="space-y-4">
@@ -319,6 +328,15 @@ export default function ProductDetailsPage() {
           )}
         </div>
       </div>
+
+      {/* Image Zoom Modal */}
+      {imgZoomed && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 cursor-zoom-out" onClick={() => setImgZoomed(false)}>
+          <div className="relative w-full max-w-3xl aspect-square">
+            <Image src={product.image} alt={product.title} fill className="object-contain" />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

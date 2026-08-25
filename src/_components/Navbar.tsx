@@ -106,6 +106,9 @@ export default function Navbar() {
 
             {/* Desktop Actions */}
             <div className="hidden md:flex items-center gap-1">
+              <Link href="/about" className="px-3 py-2 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all">
+                About
+              </Link>
               {isUser && (
                 <Link href="/wishlist" className="p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all" title="Wishlist">
                   <HeartIcon className="h-5 w-5" />
@@ -203,6 +206,10 @@ export default function Navbar() {
           )}
 
           <div className="flex-1 overflow-y-auto p-4 space-y-1">
+            <Link href="/about" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all">
+              About
+            </Link>
+
             {isUser && (
               <Link href="/profile" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all">
                 <UserCircleIcon className="h-5 w-5" />

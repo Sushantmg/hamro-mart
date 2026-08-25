@@ -5,6 +5,7 @@ import { CartProvider } from "@/context/CartContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import Navbar from "@/_components/Navbar";
+import BackToTop from "@/_components/BackToTop";
 import { Toaster } from "react-hot-toast";
 
 const inter = Inter({
@@ -93,6 +94,7 @@ export default function RootLayout({
                   },
                 }}
               />
+              <BackToTop />
             </WishlistProvider>
           </CartProvider>
         </ThemeProvider>

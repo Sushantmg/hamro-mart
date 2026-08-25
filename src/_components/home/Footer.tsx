@@ -76,6 +76,7 @@ export default function Footer() {
                 { label: "Shop All", href: "/products" },
                 { label: "Fruits", href: "/products?category=fruits" },
                 { label: "Vegetables", href: "/products?category=vegetables" },
+                { label: "About Us", href: "/about" },
                 { label: "My Orders", href: "/orders" },
               ].map((link) => (
                 <li key={link.label}>
