@@ -13,6 +13,7 @@ import {
   ArrowRightOnRectangleIcon,
   ShieldCheckIcon,
   MagnifyingGlassIcon,
+  Cog6ToothIcon,
 } from "@heroicons/react/24/outline";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
@@ -137,6 +138,12 @@ export default function Navbar() {
                 </Link>
               )}
 
+              {isUser && (
+                <Link href="/settings" className="p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all" title="Settings">
+                  <Cog6ToothIcon className="h-5 w-5" />
+                </Link>
+              )}
+
               {isLoggedIn ? (
                 <button
                   onClick={handleLogout}
@@ -214,6 +221,13 @@ export default function Navbar() {
               <Link href="/profile" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all">
                 <UserCircleIcon className="h-5 w-5" />
                 Profile
+              </Link>
+            )}
+
+            {isUser && (
+              <Link href="/settings" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all">
+                <Cog6ToothIcon className="h-5 w-5" />
+                Settings
               </Link>
             )}
 

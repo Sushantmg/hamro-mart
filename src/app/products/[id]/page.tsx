@@ -7,8 +7,9 @@ import Link from "next/link";
 import Cookies from "js-cookie";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
+import { useRecentlyViewed } from "@/context/RecentlyViewedContext";
 import toast from "react-hot-toast";
-import { HeartIcon, MinusIcon, PlusIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { HeartIcon, MinusIcon, PlusIcon, MagnifyingGlassIcon, ShareIcon } from "@heroicons/react/24/outline";
 import { HeartIcon as HeartSolidIcon } from "@heroicons/react/24/solid";
 import { StarIcon as StarSolidIcon } from "@heroicons/react/24/solid";
 
@@ -53,8 +54,10 @@ export default function ProductDetailsPage() {
   const [quantity, setQuantity] = useState(1);
   const [loadingReviews, setLoadingReviews] = useState(true);
   const [imgZoomed, setImgZoomed] = useState(false);
+  const [stock] = useState(() => Math.floor(Math.random() * 30) + 1);
   const { addToCart } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
+  const { addProduct: trackView } = useRecentlyViewed();
 
   const productId = Number(id);
 
@@ -79,7 +82,9 @@ export default function ProductDetailsPage() {
     fetch(`/api/products/${id}`)
       .then((res) => res.json())
       .then((item: RawProduct) => {
-        setProduct(transformProduct(item));
+        const transformed = transformProduct(item);
+        setProduct(transformed);
+        trackView({ id: transformed.id, title: transformed.title, price: transformed.price, discountedPrice: transformed.discountedPrice, image: transformed.image, category: transformed.category });
         fetch("/api/products")
           .then((res) => res.json())
           .then((all: RawProduct[]) => {
@@ -90,7 +95,7 @@ export default function ProductDetailsPage() {
             setRelatedProducts(related);
           });
       });
-  }, [id, transformProduct]);
+  }, [id, transformProduct, trackView]);
 
   const fetchReviews = useCallback(() => {
     fetch(`/api/reviews?productId=${id}`)
@@ -231,15 +236,37 @@ export default function ProductDetailsPage() {
                 </div>
               </div>
 
-              <button
-                onClick={() => {
-                  for (let i = 0; i < quantity; i++) addToCart(product);
-                  toast.success(`${quantity}x ${product.title} added to cart!`);
-                }}
-                className="btn-primary w-full text-lg"
-              >
-                Add to Cart — ${(finalPrice * quantity).toFixed(2)}
-              </button>
+              <div className="flex items-center gap-2">
+                {stock > 10 ? (
+                  <span className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">In Stock</span>
+                ) : stock > 0 ? (
+                  <span className="text-sm text-amber-600 dark:text-amber-400 font-medium">Only {stock} left</span>
+                ) : (
+                  <span className="text-sm text-red-600 dark:text-red-400 font-medium">Out of Stock</span>
+                )}
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => {
+                    for (let i = 0; i < quantity; i++) addToCart(product);
+                    toast.success(`${quantity}x ${product.title} added to cart!`);
+                  }}
+                  className="btn-primary flex-1 text-lg"
+                >
+                  Add to Cart — ${(finalPrice * quantity).toFixed(2)}
+                </button>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(window.location.href);
+                    toast.success("Link copied!");
+                  }}
+                  className="p-3 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-500 hover:text-emerald-600 hover:border-emerald-300 dark:hover:text-emerald-400 transition-all"
+                  title="Share"
+                >
+                  <ShareIcon className="h-5 w-5" />
+                </button>
+              </div>
             </div>
           </div>
 

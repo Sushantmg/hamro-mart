@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ShoppingBagIcon } from "@heroicons/react/24/outline";
+import { ShoppingBagIcon, CheckCircleIcon, ClockIcon, TruckIcon, ClipboardDocumentCheckIcon } from "@heroicons/react/24/outline";
 
 type OrderItem = { productId: number; name: string; price: number; quantity: number };
 type Order = { id: number; userId: number; items: OrderItem[]; total: number; status: string; createdAt: string };
@@ -16,6 +16,52 @@ const statusStyles: Record<string, string> = {
   delivered: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400",
   cancelled: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
 };
+
+const timelineSteps = ["pending", "processing", "shipped", "delivered"];
+const timelineIcons = [ClockIcon, ClipboardDocumentCheckIcon, TruckIcon, CheckCircleIcon];
+
+function OrderTimeline({ status }: { status: string }) {
+  if (status === "cancelled") {
+    return (
+      <div className="flex items-center gap-2 text-red-500 text-sm font-medium">
+        <div className="w-3 h-3 rounded-full bg-red-500" />
+        Order Cancelled
+      </div>
+    );
+  }
+
+  const currentIdx = timelineSteps.indexOf(status);
+  if (currentIdx === -1) return null;
+
+  return (
+    <div className="flex items-center gap-0 mt-4">
+      {timelineSteps.map((step, i) => {
+        const Icon = timelineIcons[i];
+        const isActive = i <= currentIdx;
+        const isCurrent = i === currentIdx;
+        return (
+          <div key={step} className="flex items-center flex-1 last:flex-none">
+            <div className="flex flex-col items-center">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+                isActive
+                  ? "bg-emerald-600 text-white"
+                  : "bg-gray-200 dark:bg-gray-700 text-gray-400"
+              } ${isCurrent ? "ring-2 ring-emerald-300 dark:ring-emerald-700" : ""}`}>
+                <Icon className="h-4 w-4" />
+              </div>
+              <span className={`text-[10px] mt-1 capitalize font-medium ${isActive ? "text-emerald-600 dark:text-emerald-400" : "text-gray-400"}`}>
+                {step}
+              </span>
+            </div>
+            {i < timelineSteps.length - 1 && (
+              <div className={`flex-1 h-0.5 mx-1 rounded ${i < currentIdx ? "bg-emerald-600" : "bg-gray-200 dark:bg-gray-700"}`} />
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function OrdersPage() {
   const router = useRouter();
@@ -47,10 +93,13 @@ export default function OrdersPage() {
 
   if (orders.length === 0) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center px-4">
-        <ShoppingBagIcon className="h-20 w-20 text-gray-300 dark:text-gray-600 mb-4" />
-        <h2 className="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-2">No orders yet</h2>
-        <p className="text-gray-500 mb-6">Start shopping to see your orders here.</p>
+      <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="w-24 h-24 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-6">
+          <ShoppingBagIcon className="h-12 w-12 text-gray-400" />
+        </div>
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">No orders yet</h2>
+        <p className="text-gray-500 mb-2">Your order history will appear here.</p>
+        <p className="text-sm text-gray-400 dark:text-gray-500 mb-8">Start shopping to place your first order!</p>
         <Link href="/products" className="btn-primary">Browse Products</Link>
       </div>
     );
@@ -59,11 +108,12 @@ export default function OrdersPage() {
   return (
     <div className="bg-gray-50 dark:bg-gray-950 min-h-screen">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
-        <h1 className="section-title mb-8">Order History ({orders.length})</h1>
+        <h1 className="section-title mb-2">Order History</h1>
+        <p className="text-gray-500 dark:text-gray-400 mb-8">{orders.length} order{orders.length !== 1 ? "s" : ""}</p>
         <div className="space-y-4">
           {orders.map((order) => (
             <div key={order.id} className="card p-6">
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-2">
                 <div>
                   <p className="font-semibold text-gray-900 dark:text-white">Order #{order.id}</p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -74,7 +124,10 @@ export default function OrdersPage() {
                   {order.status}
                 </span>
               </div>
-              <div className="border-t pt-4 space-y-2">
+
+              <OrderTimeline status={order.status} />
+
+              <div className="border-t mt-4 pt-4 space-y-2">
                 {order.items.map((item, i) => (
                   <div key={i} className="flex justify-between text-sm">
                     <span className="text-gray-600 dark:text-gray-400">{item.name} &times; {item.quantity}</span>
