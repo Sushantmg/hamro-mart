@@ -14,8 +14,8 @@ const products = [
   { id: 1, name: "Apple", category: "fruits", image: "https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?auto=format&fit=crop&w=400&q=80", desc: "Crisp and juicy fresh apples, perfect for snacking or baking.", price: 2.99, discount: 10 },
   { id: 2, name: "Banana", category: "fruits", image: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=400&q=80", desc: "Sweet and ripe bananas, rich in potassium.", price: 1.29, discount: 0 },
   { id: 3, name: "Carrot", category: "vegetables", image: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?auto=format&fit=crop&w=400&q=80", desc: "Crunchy organic carrots, rich in Vitamin A and beta-carotene.", price: 1.49, discount: 20 },
-  { id: 4, name: "Broccoli", category: "vegetables", image: "https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?auto=format&fit=crop&w=400&q=80", desc: "Fresh green broccoli florets, packed with nutrients.", price: 2.49, discount: 0 },
-  { id: 5, name: "Tomato", category: "vegetables", image: "https://images.unsplash.com/photo-1546470427-0d4db154ceb8?auto=format&fit=crop&w=400&q=80", desc: "Juicy organic tomatoes, vine-ripened for maximum flavor.", price: 1.99, discount: 10 },
+  { id: 4, name: "Broccoli", category: "vegetables", image: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=400&q=80", desc: "Fresh green broccoli florets, packed with nutrients.", price: 2.49, discount: 0 },
+  { id: 5, name: "Tomato", category: "vegetables", image: "https://images.unsplash.com/photo-1517159506519-39585ac14517?auto=format&fit=crop&w=400&q=80", desc: "Juicy organic tomatoes, vine-ripened for maximum flavor.", price: 1.99, discount: 10 },
   { id: 6, name: "Strawberry", category: "fruits", image: "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?auto=format&fit=crop&w=400&q=80", desc: "Sweet red strawberries, freshly picked and hand-selected.", price: 3.99, discount: 20 },
   { id: 7, name: "Pineapple", category: "fruits", image: "https://images.unsplash.com/photo-1550258987-190a2d41a8ba?auto=format&fit=crop&w=400&q=80", desc: "Tangy tropical pineapple, perfect for smoothies and desserts.", price: 2.49, discount: 0 },
   { id: 8, name: "Spinach", category: "vegetables", image: "https://images.unsplash.com/photo-1576045057995-568f588f82fb?auto=format&fit=crop&w=400&q=80", desc: "Fresh leafy spinach, great for salads and smoothies.", price: 1.99, discount: 10 },
@@ -24,9 +24,9 @@ const products = [
   { id: 11, name: "Lettuce", category: "vegetables", image: "https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?auto=format&fit=crop&w=400&q=80", desc: "Crisp iceberg lettuce, perfect for salads and wraps.", price: 1.29, discount: 0 },
   { id: 12, name: "Bell Pepper", category: "vegetables", image: "https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?auto=format&fit=crop&w=400&q=80", desc: "Colorful bell peppers, sweet and crunchy.", price: 2.29, discount: 10 },
   { id: 13, name: "Grapes", category: "fruits", image: "https://images.unsplash.com/photo-1537640538966-79f369143f8f?auto=format&fit=crop&w=400&q=80", desc: "Seedless green grapes, sweet and refreshing.", price: 3.99, discount: 0 },
-  { id: 14, name: "Potato", category: "vegetables", image: "https://images.unsplash.com/photo-1518977676601-b53f82ber20d?auto=format&fit=crop&w=400&q=80", desc: "Premium baking potatoes, fluffy and versatile.", price: 0.99, discount: 0 },
-  { id: 15, name: "Blueberry", category: "fruits", image: "https://images.unsplash.com/photo-1498557850523-fd3d1186bcff?auto=format&fit=crop&w=400&q=80", desc: "Organic blueberries, packed with antioxidants.", price: 4.99, discount: 10 },
-  { id: 16, name: "Onion", category: "vegetables", image: "https://images.unsplash.com/photo-1618512496248-a09fe1f0e047?auto=format&fit=crop&w=400&q=80", desc: "Fresh yellow onions, essential for every kitchen.", price: 0.89, discount: 0 },
+  { id: 14, name: "Potato", category: "vegetables", image: "https://images.unsplash.com/photo-1561635741-c416a5193b6e?auto=format&fit=crop&w=400&q=80", desc: "Premium baking potatoes, fluffy and versatile.", price: 0.99, discount: 0 },
+  { id: 15, name: "Blueberry", category: "fruits", image: "https://images.unsplash.com/photo-1502741338009-cac2772e18bc?auto=format&fit=crop&w=400&q=80", desc: "Organic blueberries, packed with antioxidants.", price: 4.99, discount: 10 },
+  { id: 16, name: "Onion", category: "vegetables", image: "https://images.unsplash.com/photo-1588613000171-55fe9ac1e10b?auto=format&fit=crop&w=400&q=80", desc: "Fresh yellow onions, essential for every kitchen.", price: 0.89, discount: 0 },
 ];
 
 async function seed() {
