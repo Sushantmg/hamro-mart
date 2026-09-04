@@ -33,10 +33,32 @@ export async function POST(request: NextRequest) {
     total: Number(total),
     status: "pending" as const,
     createdAt: new Date().toISOString(),
+    shipping: body.shipping || null,
   };
 
   data.orders.push(newOrder);
   await writeDB(data);
 
   return NextResponse.json(newOrder, { status: 201 });
+}
+
+export async function PATCH(request: NextRequest) {
+  const body = await request.json();
+  const { orderId, status } = body;
+
+  if (!orderId || !status) {
+    return NextResponse.json({ error: "orderId and status are required" }, { status: 400 });
+  }
+
+  const data = await readDB();
+  const order = data.orders.find((o) => o.id === orderId);
+
+  if (!order) {
+    return NextResponse.json({ error: "Order not found" }, { status: 404 });
+  }
+
+  order.status = status;
+  await writeDB(data);
+
+  return NextResponse.json(order);
 }

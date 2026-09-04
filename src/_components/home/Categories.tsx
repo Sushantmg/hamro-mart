@@ -3,14 +3,11 @@
 import Link from "next/link";
 import { GiCarrot, GiFruitBowl } from "react-icons/gi";
 import { MdLocalGroceryStore } from "react-icons/md";
-import { FaEgg, FaCheese } from "react-icons/fa";
 
 const categories = [
   { icon: GiCarrot, label: "Vegetables", href: "/products?category=vegetables", color: "from-orange-400 to-orange-600" },
   { icon: GiFruitBowl, label: "Fruits", href: "/products?category=fruits", color: "from-red-400 to-red-600" },
   { icon: MdLocalGroceryStore, label: "All Products", href: "/products", color: "from-emerald-400 to-emerald-600" },
-  { icon: FaCheese, label: "Dairy", href: "/products", color: "from-yellow-400 to-yellow-600" },
-  { icon: FaEgg, label: "Eggs", href: "/products", color: "from-amber-400 to-amber-600" },
 ];
 
 export default function Categories() {

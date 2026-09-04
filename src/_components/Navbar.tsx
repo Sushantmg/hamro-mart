@@ -17,12 +17,12 @@ import {
 } from "@heroicons/react/24/outline";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { useThemeContext } from "../context/ThemeContext";
-import { useCart } from "../context/CartContext";
+import { useThemeContext } from "@/context/ThemeContext";
+import { useCart } from "@/context/CartContext";
 
 export default function Navbar() {
   const { darkMode, toggleTheme } = useThemeContext();
-  const { totalItems } = useCart();
+  const { totalItems, clearCart } = useCart();
   const [token, setToken] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -37,9 +37,9 @@ export default function Navbar() {
 
   useEffect(() => {
     checkAuth();
-    const interval = setInterval(checkAuth, 1000);
+    const interval = setInterval(checkAuth, 5000);
     return () => clearInterval(interval);
-  }, [checkAuth, pathname]);
+  }, [checkAuth]);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -58,6 +58,7 @@ export default function Navbar() {
 
   const handleLogout = () => {
     Cookies.remove("ecom-token");
+    clearCart();
     setToken(null);
     setMobileMenuOpen(false);
     router.push("/login");
@@ -111,12 +112,12 @@ export default function Navbar() {
                 About
               </Link>
               {isUser && (
-                <Link href="/wishlist" className="p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all" title="Wishlist">
+                <Link href="/wishlist" className="p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all" title="Wishlist" aria-label="Wishlist">
                   <HeartIcon className="h-5 w-5" />
                 </Link>
               )}
 
-              <Link href="/cart" className="relative p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all" title="Cart">
+              <Link href="/cart" className="relative p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all" title="Cart" aria-label="Shopping cart">
                 <ShoppingCartIcon className="h-5 w-5" />
                 {totalItems > 0 && (
                   <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center">
@@ -133,13 +134,13 @@ export default function Navbar() {
               )}
 
               {isUser && (
-                <Link href="/profile" className="p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all" title="Profile">
+                <Link href="/profile" className="p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all" title="Profile" aria-label="User profile">
                   <UserCircleIcon className="h-5 w-5" />
                 </Link>
               )}
 
               {isUser && (
-                <Link href="/settings" className="p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all" title="Settings">
+                <Link href="/settings" className="p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all" title="Settings" aria-label="Account settings">
                   <Cog6ToothIcon className="h-5 w-5" />
                 </Link>
               )}
@@ -158,10 +159,11 @@ export default function Navbar() {
                 </Link>
               )}
 
-              <button
-                onClick={toggleTheme}
-                className="p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition-all"
-                title={darkMode ? "Light mode" : "Dark mode"}
+                <button
+                  onClick={toggleTheme}
+                  className="p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition-all"
+                  title={darkMode ? "Light mode" : "Dark mode"}
+                  aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
               >
                 {darkMode ? <SunIcon className="h-5 w-5" /> : <MoonIcon className="h-5 w-5" />}
               </button>
@@ -213,6 +215,11 @@ export default function Navbar() {
           )}
 
           <div className="flex-1 overflow-y-auto p-4 space-y-1">
+            <Link href="/products" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all">
+              <ShoppingCartIcon className="h-5 w-5" />
+              Products
+            </Link>
+
             <Link href="/about" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all">
               About
             </Link>

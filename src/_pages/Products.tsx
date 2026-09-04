@@ -3,11 +3,11 @@
 import { useEffect, useState, useCallback, Suspense } from "react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import { useCart } from "../context/CartContext";
-import { useWishlist } from "../context/WishlistContext";
+import { useCart } from "@/context/CartContext";
+import { useWishlist } from "@/context/WishlistContext";
 import toast from "react-hot-toast";
 import Link from "next/link";
-import { HeartIcon, ArrowUpIcon, FunnelIcon } from "@heroicons/react/24/outline";
+import { HeartIcon, FunnelIcon } from "@heroicons/react/24/outline";
 import { HeartIcon as HeartSolidIcon } from "@heroicons/react/24/solid";
 
 interface ApiProduct {
@@ -50,7 +50,6 @@ function ProductsContent() {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
-  const [showScrollTop, setShowScrollTop] = useState(false);
   const searchParams = useSearchParams();
   const { addToCart } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
@@ -61,12 +60,6 @@ function ProductsContent() {
     if (q) setSearchTerm(q);
     if (cat) setCategoryFilter(cat);
   }, [searchParams]);
-
-  useEffect(() => {
-    const handleScroll = () => setShowScrollTop(window.scrollY > 400);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   useEffect(() => {
     fetch("/api/products")
@@ -190,15 +183,17 @@ function ProductsContent() {
             : filteredProducts.map((product) => {
                 const finalPrice = product.discountedPrice ?? product.price;
                 return (
-                  <div key={product.id} className="card group p-4 flex flex-col">
+                  <div key={product.id} className="card group p-4 flex flex-col relative">
                     {/* Wishlist button */}
                     <button
                       onClick={(e) => {
                         e.preventDefault();
+                        const wasIn = isInWishlist(product.id);
                         toggleWishlist(product.id);
-                        toast.success(isInWishlist(product.id) ? "Removed from wishlist" : "Added to wishlist");
+                        toast.success(wasIn ? "Removed from wishlist" : "Added to wishlist");
                       }}
                       className="absolute top-6 right-6 z-10 p-1.5 rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm"
+                      aria-label={isInWishlist(product.id) ? "Remove from wishlist" : "Add to wishlist"}
                     >
                       {isInWishlist(product.id) ? (
                         <HeartSolidIcon className="h-5 w-5 text-red-500" />
@@ -269,16 +264,6 @@ function ProductsContent() {
         </div>
       </div>
 
-      {/* Scroll to top */}
-      {showScrollTop && (
-        <button
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="fixed bottom-6 right-6 w-12 h-12 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all z-50"
-          aria-label="Scroll to top"
-        >
-          <ArrowUpIcon className="h-5 w-5" />
-        </button>
-      )}
     </div>
   );
 }

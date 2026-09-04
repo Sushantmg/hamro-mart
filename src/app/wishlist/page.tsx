@@ -72,7 +72,7 @@ export default function WishlistPage() {
                     <ShoppingCartIcon className="h-4 w-4" />
                     Add to Cart
                   </button>
-                  <button onClick={() => toggleWishlist(p.id)} className="p-2 rounded-xl border border-red-200 dark:border-red-800 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors">
+                  <button onClick={() => toggleWishlist(p.id)} className="p-2 rounded-xl border border-red-200 dark:border-red-800 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors" aria-label="Remove from wishlist">
                     <HeartIcon className="h-4 w-4 fill-current" />
                   </button>
                 </div>

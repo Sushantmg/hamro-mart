@@ -9,7 +9,7 @@ import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useRecentlyViewed } from "@/context/RecentlyViewedContext";
 import toast from "react-hot-toast";
-import { HeartIcon, MinusIcon, PlusIcon, MagnifyingGlassIcon, ShareIcon } from "@heroicons/react/24/outline";
+import { HeartIcon, MinusIcon, PlusIcon, MagnifyingGlassIcon, ShareIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { HeartIcon as HeartSolidIcon } from "@heroicons/react/24/solid";
 import { StarIcon as StarSolidIcon } from "@heroicons/react/24/solid";
 
@@ -107,6 +107,14 @@ export default function ProductDetailsPage() {
     fetchReviews();
   }, [fetchReviews]);
 
+  useEffect(() => {
+    if (!imgZoomed) return;
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") setImgZoomed(false); };
+    document.addEventListener("keydown", handler);
+    document.body.style.overflow = "hidden";
+    return () => { document.removeEventListener("keydown", handler); document.body.style.overflow = ""; };
+  }, [imgZoomed]);
+
   const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const token = Cookies.get("ecom-token");
@@ -191,7 +199,7 @@ export default function ProductDetailsPage() {
                     {product.category}
                   </span>
                 </div>
-                <button onClick={() => { toggleWishlist(product.id); toast.success(isInWishlist(product.id) ? "Removed from wishlist" : "Added to wishlist"); }} className="p-2">
+                <button onClick={() => { const wasIn = isInWishlist(product.id); toggleWishlist(product.id); toast.success(wasIn ? "Removed from wishlist" : "Added to wishlist"); }} className="p-2" aria-label={isInWishlist(product.id) ? "Remove from wishlist" : "Add to wishlist"}>
                   {isInWishlist(product.id)
                     ? <HeartSolidIcon className="h-6 w-6 text-red-500" />
                     : <HeartIcon className="h-6 w-6 text-gray-400 hover:text-red-500 transition-colors" />
@@ -226,13 +234,13 @@ export default function ProductDetailsPage() {
               <div className="flex items-center gap-3">
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Quantity:</span>
                 <div className="flex items-center border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
-                  <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                    <MinusIcon className="h-4 w-4" />
-                  </button>
-                  <span className="px-4 py-2 font-semibold text-sm min-w-[40px] text-center">{quantity}</span>
-                  <button onClick={() => setQuantity(quantity + 1)} className="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                    <PlusIcon className="h-4 w-4" />
-                  </button>
+                   <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" aria-label="Decrease quantity">
+                     <MinusIcon className="h-4 w-4" />
+                   </button>
+                   <span className="px-4 py-2 font-semibold text-sm min-w-[40px] text-center">{quantity}</span>
+                   <button onClick={() => setQuantity(quantity + 1)} className="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" aria-label="Increase quantity">
+                     <PlusIcon className="h-4 w-4" />
+                   </button>
                 </div>
               </div>
 
@@ -280,7 +288,7 @@ export default function ProductDetailsPage() {
                 <label className="block text-sm text-gray-600 dark:text-gray-400 mb-2">Rating</label>
                 <div className="flex gap-1">
                   {[1, 2, 3, 4, 5].map((s) => (
-                    <button key={s} type="button" onClick={() => setRating(s)} className="focus:outline-none">
+                    <button key={s} type="button" onClick={() => setRating(s)} className="focus:outline-none" aria-label={`Rate ${s} star${s > 1 ? "s" : ""}`}>
                       <StarSolidIcon className={`h-7 w-7 transition-colors ${s <= rating ? "text-amber-400" : "text-gray-300 hover:text-amber-200"}`} />
                     </button>
                   ))}
@@ -358,9 +366,12 @@ export default function ProductDetailsPage() {
 
       {/* Image Zoom Modal */}
       {imgZoomed && (
-        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 cursor-zoom-out" onClick={() => setImgZoomed(false)}>
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 cursor-zoom-out" onClick={() => setImgZoomed(false)} role="dialog" aria-modal="true" aria-label="Image zoom">
+          <button onClick={() => setImgZoomed(false)} className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors z-10" aria-label="Close zoom">
+            <XMarkIcon className="h-6 w-6" />
+          </button>
           <div className="relative w-full max-w-3xl aspect-square">
-            <Image src={product.image} alt={product.title} fill className="object-contain" />
+            <Image src={product.image} alt={product.title} fill className="object-contain" sizes="(max-width: 768px) 100vw, 768px" />
           </div>
         </div>
       )}

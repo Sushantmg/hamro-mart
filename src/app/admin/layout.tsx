@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { HomeIcon, CubeIcon, UserGroupIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
+import { HomeIcon, CubeIcon, UserGroupIcon, ArrowLeftIcon, ClipboardDocumentListIcon } from "@heroicons/react/24/outline";
 
 const navItems = [
   { name: "Dashboard", href: "/admin", icon: HomeIcon },
   { name: "Products", href: "/admin/products", icon: CubeIcon },
   { name: "Users", href: "/admin/users", icon: UserGroupIcon },
+  { name: "Orders", href: "/admin/orders", icon: ClipboardDocumentListIcon },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
