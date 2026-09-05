@@ -1,5 +1,6 @@
 import path from "path";
 import { promises as fs } from "fs";
+import seedDB from "../../data/db.json";
 
 export interface Product {
   id: number;
@@ -34,6 +35,7 @@ export interface Order {
   total: number;
   status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
   createdAt: string;
+  shipping?: { fullName: string; address: string; city: string; phone: string };
 }
 
 export interface Review {
@@ -63,12 +65,65 @@ export interface DB {
 
 const filePath = path.join(process.cwd(), "data", "db.json");
 
+const KV_KEY = "hamro-mart-db";
+
+function isKVConfigured(): boolean {
+  return Boolean(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
+}
+
+async function kvGetRaw(): Promise<string | null> {
+  const base = process.env.KV_REST_API_URL!.replace(/\/$/, "");
+  const res = await fetch(`${base}/get/${KV_KEY}`, {
+    headers: { Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}` },
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error(`KV get failed: ${res.status}`);
+  const data = (await res.json()) as { result: string | null };
+  return data.result;
+}
+
+async function kvSetRaw(value: string): Promise<void> {
+  const base = process.env.KV_REST_API_URL!.replace(/\/$/, "");
+  const res = await fetch(`${base}/set/${KV_KEY}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`,
+      "Content-Type": "application/json",
+    },
+    body: value,
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error(`KV set failed: ${res.status}`);
+}
+
+function seedData(): DB {
+  return {
+    products: Array.isArray(seedDB.products) ? seedDB.products : [],
+    users: Array.isArray(seedDB.users) ? seedDB.users : [],
+    cart: Array.isArray(seedDB.cart) ? seedDB.cart : [],
+    orders: Array.isArray(seedDB.orders) ? seedDB.orders : [],
+    reviews: Array.isArray(seedDB.reviews) ? seedDB.reviews : [],
+    wishlist: Array.isArray(seedDB.wishlist) ? seedDB.wishlist : [],
+  } as DB;
+}
+
 export async function readDB(): Promise<DB> {
+  if (isKVConfigured()) {
+    const raw = await kvGetRaw();
+    if (raw) return JSON.parse(raw) as DB;
+    const seed = seedData();
+    await kvSetRaw(JSON.stringify(seed));
+    return seed;
+  }
   const jsonData = await fs.readFile(filePath, "utf-8");
   return JSON.parse(jsonData);
 }
 
 export async function writeDB(data: DB): Promise<void> {
+  if (isKVConfigured()) {
+    await kvSetRaw(JSON.stringify(data));
+    return;
+  }
   await fs.writeFile(filePath, JSON.stringify(data, null, 2));
 }
 
