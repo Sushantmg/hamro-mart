@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 
 const users = [
-  { id: 0, name: "Admin", email: "admin@hamromart.com", password: "admin123", role: "admin" as const, createdAt: "2025-01-01T00:00:00.000Z" },
+  { id: 7, name: "Admin", email: "admin@hamromart.com", password: "admin123", role: "admin" as const, createdAt: "2025-01-01T00:00:00.000Z" },
   { id: 1, name: "Sushant", email: "sus@gmail.com", password: "1234", role: "user" as const, createdAt: "2025-01-02T00:00:00.000Z" },
   { id: 2, name: "Test User", email: "testuser1@example.com", password: "pass123", role: "user" as const, createdAt: "2025-01-03T00:00:00.000Z" },
   { id: 3, name: "Alice Johnson", email: "alice@example.com", password: "alice123", role: "user" as const, createdAt: "2025-01-04T00:00:00.000Z" },

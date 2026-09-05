@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
   const { userId, items, total } = body;
 
-  if (!userId || !items || !items.length || !total) {
+  if (userId == null || !items || !items.length || total == null || Number.isNaN(Number(total))) {
     return NextResponse.json({ error: "userId, items, and total are required" }, { status: 400 });
   }
 

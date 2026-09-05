@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
   const { userId, productId } = body;
 
-  if (!userId || !productId) {
+  if (userId == null || !productId) {
     return NextResponse.json({ error: "userId and productId are required" }, { status: 400 });
   }
 
