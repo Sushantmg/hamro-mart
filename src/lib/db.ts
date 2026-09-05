@@ -1,5 +1,6 @@
 import path from "path";
 import { promises as fs } from "fs";
+import { Redis } from "@upstash/redis";
 import seedDB from "../../data/db.json";
 
 export interface Product {
@@ -67,33 +68,13 @@ const filePath = path.join(process.cwd(), "data", "db.json");
 
 const KV_KEY = "hamro-mart-db";
 
-function isKVConfigured(): boolean {
-  return Boolean(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
-}
-
-async function kvGetRaw(): Promise<string | null> {
-  const base = process.env.KV_REST_API_URL!.replace(/\/$/, "");
-  const res = await fetch(`${base}/get/${KV_KEY}`, {
-    headers: { Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}` },
-    cache: "no-store",
-  });
-  if (!res.ok) throw new Error(`KV get failed: ${res.status}`);
-  const data = (await res.json()) as { result: string | null };
-  return data.result;
-}
-
-async function kvSetRaw(value: string): Promise<void> {
-  const base = process.env.KV_REST_API_URL!.replace(/\/$/, "");
-  const res = await fetch(`${base}/set/${KV_KEY}`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`,
-      "Content-Type": "application/json",
-    },
-    body: value,
-    cache: "no-store",
-  });
-  if (!res.ok) throw new Error(`KV set failed: ${res.status}`);
+function getRedis(): Redis | null {
+  if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) return null;
+  try {
+    return Redis.fromEnv();
+  } catch {
+    return null;
+  }
 }
 
 function seedData(): DB {
@@ -108,11 +89,12 @@ function seedData(): DB {
 }
 
 export async function readDB(): Promise<DB> {
-  if (isKVConfigured()) {
-    const raw = await kvGetRaw();
+  const redis = getRedis();
+  if (redis) {
+    const raw = await redis.get<string>(KV_KEY);
     if (raw) return JSON.parse(raw) as DB;
     const seed = seedData();
-    await kvSetRaw(JSON.stringify(seed));
+    await redis.set(KV_KEY, JSON.stringify(seed));
     return seed;
   }
   const jsonData = await fs.readFile(filePath, "utf-8");
@@ -120,8 +102,9 @@ export async function readDB(): Promise<DB> {
 }
 
 export async function writeDB(data: DB): Promise<void> {
-  if (isKVConfigured()) {
-    await kvSetRaw(JSON.stringify(data));
+  const redis = getRedis();
+  if (redis) {
+    await redis.set(KV_KEY, JSON.stringify(data));
     return;
   }
   await fs.writeFile(filePath, JSON.stringify(data, null, 2));
