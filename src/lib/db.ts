@@ -88,11 +88,30 @@ function seedData(): DB {
   } as DB;
 }
 
+function isValidDB(value: unknown): value is DB {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    Array.isArray((value as DB).products) &&
+    Array.isArray((value as DB).users) &&
+    Array.isArray((value as DB).orders) &&
+    Array.isArray((value as DB).reviews) &&
+    Array.isArray((value as DB).wishlist)
+  );
+}
+
 export async function readDB(): Promise<DB> {
   const redis = getRedis();
   if (redis) {
     const raw = await redis.get<string>(KV_KEY);
-    if (raw) return JSON.parse(raw) as DB;
+    if (raw) {
+      try {
+        const parsed: unknown = JSON.parse(raw);
+        if (isValidDB(parsed)) return parsed;
+      } catch {
+        // corrupted value -> reseed below
+      }
+    }
     const seed = seedData();
     await redis.set(KV_KEY, JSON.stringify(seed));
     return seed;
