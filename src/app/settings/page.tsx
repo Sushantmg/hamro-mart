@@ -80,18 +80,18 @@ export default function SettingsPage() {
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Profile Information</h2>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Full Name</label>
+              <label htmlFor="settings-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Full Name</label>
               <div className="relative">
                 <UserCircleIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input type="text" value={name} onChange={(e) => setName(e.target.value)} required className="input-field !pl-10" />
+                <input id="settings-name" type="text" value={name} onChange={(e) => setName(e.target.value)} required className="input-field !pl-10" />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Email</label>
+              <label htmlFor="settings-email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Email</label>
               <div className="relative">
                 <EnvelopeIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="input-field !pl-10" />
+                <input id="settings-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="input-field !pl-10" />
               </div>
             </div>
 
@@ -106,10 +106,10 @@ export default function SettingsPage() {
             <p className="text-sm text-gray-500 dark:text-gray-400">Leave blank to keep your current password.</p>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">New Password</label>
+              <label htmlFor="settings-password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">New Password</label>
               <div className="relative">
                 <KeyIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Min 6 characters" className="input-field !pl-10" minLength={6} />
+                <input id="settings-password" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Min 6 characters" className="input-field !pl-10" minLength={6} />
               </div>
             </div>
           </div>

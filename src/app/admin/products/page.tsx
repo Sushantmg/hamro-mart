@@ -93,6 +93,10 @@ export default function ManageProducts() {
             <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="input-field">
               <option value="fruits">Fruits</option>
               <option value="vegetables">Vegetables</option>
+              <option value="dairy">Dairy</option>
+              <option value="bakery">Bakery</option>
+              <option value="beverages">Beverages</option>
+              <option value="snacks">Snacks</option>
             </select>
             <input placeholder="Image URL" value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} className="input-field" />
             <input placeholder="Description" value={form.desc} onChange={(e) => setForm({ ...form, desc: e.target.value })} className="input-field" />
@@ -131,8 +135,8 @@ export default function ManageProducts() {
                     <td className="px-6 py-4">{finalPrice !== null ? <span className="font-medium text-gray-900 dark:text-white">${finalPrice.toFixed(2)}</span> : <span className="text-gray-400">-</span>}</td>
                     <td className="px-6 py-4">
                       <div className="flex gap-2">
-                        <button onClick={() => handleEdit(p)} className="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-colors"><PencilIcon className="h-4 w-4" /></button>
-                        <button onClick={() => handleDelete(p.id)} className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"><TrashIcon className="h-4 w-4" /></button>
+                        <button onClick={() => handleEdit(p)} className="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-colors" aria-label={`Edit ${p.name}`}><PencilIcon className="h-4 w-4" /></button>
+                        <button onClick={() => handleDelete(p.id)} className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors" aria-label={`Delete ${p.name}`}><TrashIcon className="h-4 w-4" /></button>
                       </div>
                     </td>
                   </tr>

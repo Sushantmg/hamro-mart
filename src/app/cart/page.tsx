@@ -20,7 +20,7 @@ export default function Cart() {
             <p className="text-gray-500 dark:text-gray-400 mt-1">{totalItems} item{totalItems !== 1 ? "s" : ""} &middot; ${totalPrice.toFixed(2)}</p>
           </div>
           {cart.length > 0 && (
-            <button onClick={clearCart} className="btn-danger !text-sm !px-4 !py-2">
+            <button onClick={clearCart} className="btn-danger !text-sm !px-4 !py-2" aria-label="Clear all items from cart">
               <TrashIcon className="h-4 w-4 mr-1 inline" />
               Clear All
             </button>
@@ -47,7 +47,13 @@ export default function Cart() {
                 return (
                   <div key={item.id} className="card p-4 flex gap-4">
                     <div className="relative w-20 h-20 rounded-xl overflow-hidden shrink-0">
-                      <Image src={item.image || ""} alt={item.title} fill className="object-cover" />
+                      {item.image ? (
+                        <Image src={item.image} alt={item.title} fill className="object-cover" sizes="80px" />
+                      ) : (
+                        <div className="w-full h-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                          <ShoppingBagIcon className="h-8 w-8 text-gray-300 dark:text-gray-600" />
+                        </div>
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-gray-900 dark:text-white truncate">{item.title}</h3>
@@ -57,6 +63,7 @@ export default function Cart() {
                           <button
                             onClick={() => updateQuantity(item.id, (item.quantity ?? 1) - 1)}
                             className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                            aria-label={`Decrease quantity of ${item.title}`}
                           >
                             <MinusIcon className="h-3.5 w-3.5" />
                           </button>
@@ -64,6 +71,7 @@ export default function Cart() {
                           <button
                             onClick={() => updateQuantity(item.id, (item.quantity ?? 1) + 1)}
                             className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                            aria-label={`Increase quantity of ${item.title}`}
                           >
                             <PlusIcon className="h-3.5 w-3.5" />
                           </button>
@@ -72,7 +80,7 @@ export default function Cart() {
                           <span className="font-bold text-emerald-600 dark:text-emerald-400">
                             ${(finalPrice * (item.quantity ?? 1)).toFixed(2)}
                           </span>
-                          <button onClick={() => removeFromCart(item.id)} className="text-red-500 hover:text-red-600 p-1">
+                          <button onClick={() => removeFromCart(item.id)} className="text-red-500 hover:text-red-600 p-1" aria-label={`Remove ${item.title} from cart`}>
                             <TrashIcon className="h-4 w-4" />
                           </button>
                         </div>

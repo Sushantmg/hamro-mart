@@ -79,7 +79,7 @@ export default function ManageUsers() {
                   </td>
                   <td className="px-6 py-4">
                     {user.role !== "admin" && (
-                      <button onClick={() => handleDelete(user.id)} className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors">
+                      <button onClick={() => handleDelete(user.id)} className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors" aria-label={`Delete user ${user.name}`}>
                         <TrashIcon className="h-4 w-4" />
                       </button>
                     )}

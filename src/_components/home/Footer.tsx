@@ -60,8 +60,12 @@ export default function Footer() {
               Your trusted local grocery store. Fresh produce, delivered with care.
             </p>
             <div className="flex gap-3">
-              {[FaFacebookF, FaTwitter, FaInstagram].map((Icon, i) => (
-                <a key={i} href="#" className="w-9 h-9 bg-gray-800 hover:bg-emerald-600 rounded-lg flex items-center justify-center transition-colors">
+              {[
+                { Icon: FaFacebookF, href: "https://facebook.com", label: "Facebook" },
+                { Icon: FaTwitter, href: "https://twitter.com", label: "Twitter" },
+                { Icon: FaInstagram, href: "https://instagram.com", label: "Instagram" },
+              ].map(({ Icon, href, label }) => (
+                <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={`Follow us on ${label}`} className="w-9 h-9 bg-gray-800 hover:bg-emerald-600 rounded-lg flex items-center justify-center transition-colors">
                   <Icon className="text-sm" />
                 </a>
               ))}
@@ -90,9 +94,14 @@ export default function Footer() {
           <div>
             <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Support</h4>
             <ul className="space-y-3 text-sm">
-              {["Help Center", "Terms & Conditions", "Privacy Policy", "Refund Policy"].map((item) => (
-                <li key={item}>
-                  <a href="#" className="hover:text-emerald-400 transition-colors">{item}</a>
+              {[
+                { label: "Help Center", href: "/about" },
+                { label: "About Us", href: "/about" },
+                { label: "Browse Products", href: "/products" },
+                { label: "Shopping Cart", href: "/cart" },
+              ].map((item) => (
+                <li key={item.label}>
+                  <Link href={item.href} className="hover:text-emerald-400 transition-colors">{item.label}</Link>
                 </li>
               ))}
             </ul>

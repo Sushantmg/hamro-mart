@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readDB, writeDB } from "@/lib/db";
+import bcrypt from "bcryptjs";
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -16,8 +17,14 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
-  const safeFields = Object.fromEntries(Object.entries(body).filter(([key]) => key !== "password"));
-  data.users[index] = { ...data.users[index], ...safeFields, id: userId };
+  const updates: Record<string, string> = {};
+  if (body.name) updates.name = body.name;
+  if (body.email) updates.email = body.email;
+  if (body.password) {
+    updates.password = await bcrypt.hash(body.password, 10);
+  }
+
+  data.users[index] = { ...data.users[index], ...updates, id: userId };
   await writeDB(data);
 
   const user = data.users[index];

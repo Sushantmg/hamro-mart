@@ -7,7 +7,7 @@ import Link from "next/link";
 import { ShoppingBagIcon, CheckCircleIcon, ClockIcon, TruckIcon, ClipboardDocumentCheckIcon } from "@heroicons/react/24/outline";
 
 type OrderItem = { productId: number; name: string; price: number; quantity: number };
-type Order = { id: number; userId: number; items: OrderItem[]; total: number; status: string; createdAt: string };
+type Order = { id: number; userId: number; items: OrderItem[]; total: number; status: string; createdAt: string; shipping?: { fullName: string; address: string; city: string; phone: string } };
 
 const statusStyles: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
@@ -126,6 +126,14 @@ export default function OrdersPage() {
               </div>
 
               <OrderTimeline status={order.status} />
+
+              {order.shipping && (
+                <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl text-xs text-gray-600 dark:text-gray-400">
+                  <p className="font-medium text-gray-800 dark:text-gray-200 mb-1">Deliver to</p>
+                  <p>{order.shipping.fullName} · {order.shipping.address}, {order.shipping.city}</p>
+                  <p>{order.shipping.phone}</p>
+                </div>
+              )}
 
               <div className="border-t mt-4 pt-4 space-y-2">
                 {order.items.map((item, i) => (
