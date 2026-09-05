@@ -8,6 +8,7 @@ import React, {
   useCallback,
   ReactNode,
 } from "react";
+import Cookies from "js-cookie";
 
 type WishlistItem = {
   id: number;
@@ -44,8 +45,14 @@ export const useWishlist = (): WishlistContextType => {
 
 function getUserId(): number | null {
   if (typeof document === "undefined") return null;
-  const match = document.cookie.match(/ecom-token=user-(\d+)/);
-  return match ? parseInt(match[1], 10) : null;
+  const token = Cookies.get("ecom-token");
+  if (!token) return null;
+  try {
+    const payload = JSON.parse(atob(token.split(".")[0]));
+    return typeof payload.id === "number" ? payload.id : null;
+  } catch {
+    return null;
+  }
 }
 
 export const WishlistProvider = ({ children }: { children: ReactNode }) => {
